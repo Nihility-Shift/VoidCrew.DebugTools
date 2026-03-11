@@ -93,7 +93,7 @@ namespace DebugTools
             if (!VoidManagerPlugin.Enabled || !GUIActive) return;
             GUI.skin = VoidManager.CustomGUI.GUIMain.ChangeSkin();
 
-            WindowRect = Window(98122, WindowRect, WindowFunc, "DebugTools");
+            WindowRect = Window(98122, WindowRect, WindowFunc, "Spawn Menu");
 
             Image.rectTransform.position = new Vector3(WindowRect.center.x, (WindowRect.center.y * -1) + Screen.height, 0);
             Image.rectTransform.sizeDelta = WindowRect.size;

@@ -1,11 +1,11 @@
 [![](https://img.shields.io/badge/-Nihility_Shift-111111?style=just-the-label&logo=github&labelColor=24292f)](https://github.com/Nihility-Shift)
-![](https://img.shields.io/badge/Game%20Version-1.2.5-111111?style=flat&labelColor=24292f&color=111111)
+![](https://img.shields.io/badge/Game%20Version-1.3.0-111111?style=flat&labelColor=24292f&color=111111)
 [![](https://img.shields.io/discord/1180651062550593536.svg?&logo=discord&logoColor=ffffff&style=flat&label=Discord&labelColor=24292f&color=111111)](https://discord.gg/g2u5wpbMGu "Void Crew Modding Discord")
 
 # Debug Tools
 
-Version 0.0.1  
-For Game Version 1.2.5  
+Version 0.0.2  
+For Game Version 1.3.0  
 Developed by Dragon  
 Requires:  BepInEx-BepInExPack-5.4.2304, NihilityShift-VoidManager-1.2.11
 
