@@ -1,10 +1,8 @@
 ﻿using BepInEx;
-using CG.Client.Player.Input;
 using CG.Client.UserData;
 using CG.Game.Player;
 using CG.Input;
 using CG.Network;
-using CG.Space;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ResourceAssets;
@@ -236,28 +234,20 @@ namespace DebugTools
         {
             Spawnables.Clear();
 
-            foreach (var AssetGUIDPair in CarryableContainer.Instance.assetDefLUT)
+            foreach (var AssetGUIDPair in CarryableContainer.Instance.RuntimeDescriptions)
             {
                 Spawnables.Add(new SpawnEntry(
-                    AssetGUIDPair.Value.ContextInfo,
-                    AssetGUIDPair.Value.Ref,
-                    AssetGUIDPair.Value.Ref.Filename,
-                    AssetGUIDPair.Key,
-                    IsItemLocked(AssetGUIDPair.Key),
-                    AssetGUIDPair.Value.Ref.IsRuntime,
+                    AssetGUIDPair.ContextInfo,
+                    AssetGUIDPair.Ref,
                     SpawnType.Carryable)
                 );
             }
 
-            foreach (var AssetGUIDPair in CompositeWeaponDataContainer.Instance.assetDefLUT)
+            foreach (var AssetGUIDPair in CompositeWeaponDataContainer.Instance.RuntimeDescriptions)
             {
                 Spawnables.Add(new SpawnEntry(
-                    AssetGUIDPair.Value.ContextInfo,
-                    AssetGUIDPair.Value.Ref,
-                    AssetGUIDPair.Value.Ref.Filename,
-                    AssetGUIDPair.Key,
-                    IsItemLocked(AssetGUIDPair.Key),
-                    AssetGUIDPair.Value.Ref.IsRuntime,
+                    AssetGUIDPair.ContextInfo,
+                    AssetGUIDPair.Ref,
                     SpawnType.CompositeWeaponBox)
                 );
             }
@@ -288,14 +278,14 @@ namespace DebugTools
         public class SpawnEntry
         {
             public SpawnEntry() { }
-            public SpawnEntry(IResourceAssetContextInfo contextInfo, ResourceAssetRef assetRef, string filename, GUIDUnion guid, bool lockedDevItem, bool runtime, SpawnType spawnType)
+            public SpawnEntry(IResourceAssetContextInfo contextInfo, ResourceAssetRef assetRef, SpawnType spawnType)
             {
                 Context = contextInfo;
                 Ref = assetRef;
-                FileName = filename;
-                GUID = guid;
-                LockedDevItem = lockedDevItem;
-                Runtime = runtime;
+                FileName = assetRef.Filename;
+                GUID = assetRef.AssetGuid;
+                LockedDevItem = IsItemLocked(GUID);
+                Runtime = assetRef.IsRuntime;
                 SpawnType = spawnType;
 
                 SEContent = new GUIContent($"{Context.HeaderText}\n{FileName}", Context.BodyText);
