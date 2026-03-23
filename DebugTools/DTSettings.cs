@@ -72,6 +72,7 @@ namespace DebugTools
             if (Button("Modules")) WikiTools.ModulesReadout();
             BeginHorizontal();
             if (Button("Endless Drop Table")) WikiTools.EndlessQuestDropTablesReadout();
+            if (Button("Endless Sector Reward Table")) WikiTools.EndlessQuestRewardsTableReadout();
             if (Button("Survivor Drop Table")) WikiTools.SurvivorQuestDropTablesReadout();
             EndHorizontal();
 

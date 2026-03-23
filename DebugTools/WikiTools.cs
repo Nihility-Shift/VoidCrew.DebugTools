@@ -30,6 +30,7 @@ namespace DebugTools
             ClonestarObjectReadout();
             ScriptableObjectReadout();
             EndlessQuestDropTablesReadout();
+            EndlessQuestRewardsTableReadout();
             SurvivorQuestDropTablesReadout();
             ShieldsReadout();
             KPDsReadout();
@@ -221,7 +222,7 @@ namespace DebugTools
         {
             BepinPlugin.Log.LogInfo("Starting Endless Drop Tables Readout");
 
-            DropTableReadout("EndlessPilgrimage.csv", Game.EndlessQuestAsset.LootTable);
+            DropTableReadout("EndlessPilgrimage", Game.EndlessQuestAsset.LootTable);
         }
 
         private static GUIDUnion SurvivorQuestGUID = new GUIDUnion("c3dcaf364807cae40b836a6ef6ebe748");
@@ -230,7 +231,7 @@ namespace DebugTools
         {
             BepinPlugin.Log.LogInfo("Starting Endless Drop Tables Readout");
 
-            DropTableReadout("SurvivorChallenge.csv", Game.GetQuestAsset(SurvivorQuestGUID).LootTable);
+            DropTableReadout("SurvivorChallenge", Game.GetQuestAsset(SurvivorQuestGUID).LootTable);
         }
 
         public static void DropTableReadout(string OutputName, LootTable lootTable)
@@ -268,6 +269,30 @@ namespace DebugTools
 
             WriteReadoutFile(OutputName + "LootData.txt", lines.ToArray());
             WriteReadoutFile(OutputName + "LootTable.csv", CSV.ToArray());
+        }
+
+        public static void EndlessQuestRewardsTableReadout()
+        {
+            List<string> lines = new();
+
+            var CDCs = Game.EndlessQuestAsset.EndlessQuestConfiguration.EndlessChapterDropData.ChapterConfigs;
+
+            lines.Add("GUID,FileName,Quantity,Difficulty,Chapter");
+            for (int i = 0; i < CDCs.Length; i++)
+            {
+                var CDC = CDCs[i];
+                foreach (var DDSD in CDC.DifficultyDrops)
+                {
+                    foreach (var DBE in DDSD.Value.Entries)
+                    {
+                        lines.Add($"{DBE.Item.AssetGuid},{DBE.Item.Filename},{DBE.Quantity},{DDSD.Key},{i}");
+                    }
+                }
+                foreach (DropBucketEntry DBE in CDC.BossDrops.Entries)
+                lines.Add($"{DBE.Item.AssetGuid},{DBE.Item.Filename},{DBE.Quantity},Boss,{i}");
+            }
+
+            WriteReadoutFile("EndlessQuestSectorRewards.csv", lines.ToArray());
         }
 
         public static string ListEnums(LootSpawnLocationType LootLocations)
