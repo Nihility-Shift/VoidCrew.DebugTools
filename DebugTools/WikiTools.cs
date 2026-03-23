@@ -233,14 +233,6 @@ namespace DebugTools
             DropTableReadout("SurvivorChallenge.csv", Game.GetQuestAsset(SurvivorQuestGUID).LootTable);
         }
 
-        /*private class DTEComparer : IComparer<LootTableEntry>
-        {
-            public int Compare(LootTableEntry x, LootTableEntry y)
-            {
-                return x.LootRarity - y.LootRarity;
-            }
-        }*/
-
         public static void DropTableReadout(string OutputName, LootTable lootTable)
         {
             List<string> lines = new();
@@ -311,67 +303,4 @@ namespace DebugTools
             }
         }
     }
-
-    /*
-    [HarmonyPatch(typeof(CompositeWeaponModule), "OnPhotonInstantiate")]
-    internal class WeaponStatsPatch
-    {
-        static void Postfix(CompositeWeaponModule __instance)
-        {
-            if (WikiTools.LogGuns)
-            {
-                WeaponFeederBase feeder = __instance.TopElementsCollection.Feeder;
-                BepinPlugin.Log.LogInfo($"{__instance.DisplayName}: Accuracy: {__instance.Accuracy.MinValue}-{__instance.Accuracy.MaxValue}, Damage: {__instance.Damage.MinValue}-{__instance.Damage.MaxValue}, FireRate: {__instance.FireRate.MinValue}-{__instance.FireRate.MaxValue}, Range: {__instance.Range.BaseValue}, Projectile Speed: {__instance.ProjectileSpeed.BaseValue}, Damage Type: {feeder.Projectile.Asset.DamageType.name}, SpreadRange: {feeder.SpreadBase}-{feeder.SpreadMax}; DecreaseSpeed - {feeder.SpreadDecreaseSpeed}; IncreaseSpeed - {feeder.SpreadIncreasePerSecond}; IncreaseFactor - {feeder.spreadIncreaseFactor}; DecreaseFactor - {feeder.spreadDecreaseFactor}");
-            }
-        }
-    }*/
-
-    /*[HarmonyPatch(typeof(ShieldModule), "ToggleShield")]
-    class ShieldStatsPatch
-    {
-        static void Postfix(ShieldModule __instance)
-        {
-            if (WikiTools.LogGuns)
-            {
-                BepinPlugin.Log.LogInfo($"{__instance.DisplayName}: Absorption: {__instance.shieldConfig.absorption}, Recharge Delay: {__instance.shieldConfig.rechargeDelay}, Recharge Speed: {__instance.shieldConfig.rechargeSpeed}, Hit Points: {__instance.shieldConfig.hitPoints}");
-            }
-        }
-    }*/
-
-    /*[HarmonyPatch(typeof(KineticPointDefenseModule), "EnterStateOn")]
-    class KPDStatsPatch
-    {
-        static void Postfix(KineticPointDefenseModule __instance)
-        {
-            if (WikiTools.LogGuns)
-            {
-                BepinPlugin.Log.LogInfo($"{__instance.DisplayName}: TrackingRange: {__instance.TrackingRange.Value}, CooldownAfterBurst: {__instance.CooldownAfterBurst.Value}, MagazineConsumptionEfficiency: {__instance.MagazineConsumptionEfficiency.Value}, AmmoUsedPerBurst: {__instance.AmmoUsedPerBurst}, BurstDuration: {__instance.BurstDuration}, CooldownAfterLossOfTarget: {__instance.CooldownAfterLossOfTarget}, TurretTrackingAngularSpeed: {__instance.TurretTrackingAngularSpeed}, TrackingTimeBeforeBurst: {__instance.TrackingTimeBeforeBurst}, FeederTravelDuration: {__instance.FeederTravelDuration}");
-            }
-        }
-    }*/
-
-    /*
-    [HarmonyPatch(typeof(PayloadMissileGameplayEffect), "OnAwake")]
-    class MissilePatch
-    {
-        static void Postfix(PayloadMissileGameplayEffect __instance)
-        {
-            if (WikiTools.LogGuns)
-            {
-                Missile missile = __instance.ReplacementObjects[0].Asset as Missile;
-                AOEMissile aoeMissile = missile as AOEMissile;
-
-                int projectileCount = __instance.ReplacementObjects.Count;
-
-                if (aoeMissile == null)
-                {
-                    BepinPlugin.Log.LogInfo($"{__instance.Payload.DisplayName}: {(projectileCount > 1 ? $"ProjectileCount: {projectileCount}," : string.Empty)} Range: {missile.Range.Value}, DamageType: {missile.DamageType.name}, Damage: {missile.Damage.Value}, TurningArcDistance: {missile.MovementArcLength}, Speed: {missile.Speed.Value}, ShootDelay: {missile.ShootDelaySeconds} SeekDelay: {missile.SeekDelaySeconds}, AngularMultiplier: {missile.angularMultiplier}");
-                }
-                else
-                {
-                    BepinPlugin.Log.LogInfo($"{__instance.Payload.DisplayName}: Range: {missile.Range.Value}, DamageType: {missile.DamageType.name}, Damage: {missile.Damage.Value}, InnerRadius: {aoeMissile.InnerExplosionRadius}, OuterRadius: {aoeMissile.OuterExplosionRadius}, TurningArcDistance: {missile.MovementArcLength}, Speed: {missile.Speed.Value}, ShootDelay: {missile.ShootDelaySeconds} SeekDelay: {missile.SeekDelaySeconds}, AngularMultiplier: {missile.angularMultiplier}");
-                }
-            }
-        }
-    }*/
 }
