@@ -70,6 +70,7 @@ namespace DebugTools
             if (Button("KPD Modules")) WikiTools.KPDsReadout();
             if (Button("Missiles")) WikiTools.MissilesReadout();
             if (Button("Modules")) WikiTools.ModulesReadout();
+            if (Button("Death Loot")) WikiTools.DeathLootReadout();
             BeginHorizontal();
             if (Button("Endless Drop Table")) WikiTools.EndlessQuestDropTablesReadout();
             if (Button("Endless Sector Reward Table")) WikiTools.EndlessQuestRewardsTableReadout();
