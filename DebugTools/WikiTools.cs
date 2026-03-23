@@ -308,7 +308,7 @@ namespace DebugTools
             }
 
             // Dev Drop Chances Calc
-            lines.Add(Game.GetQuestAsset(SurvivorQuestGUID).LootTable.DropChancesText());
+            lines.Add(lootTable.DropChancesText());
 
             WriteReadoutFile(OutputName + "LootData.txt", lines.ToArray());
             WriteReadoutFile(OutputName + "LootTable.csv", CSV.ToArray());
