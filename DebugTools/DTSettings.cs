@@ -66,6 +66,10 @@ namespace DebugTools
             if (Button("Craftables")) WikiTools.CraftablesReadout(WikiDebugItems);
             if (Button("Quest Assets")) WikiTools.QuestAssetReadout();
             if (Button("Scriptable Objects")) WikiTools.ScriptableObjectReadout();
+            if (Button("Shield Modules")) WikiTools.ShieldsReadout();
+            if (Button("KPD Modules")) WikiTools.KPDsReadout();
+            if (Button("Missiles")) WikiTools.MissilesReadout();
+            if (Button("Modules")) WikiTools.ModulesReadout();
             BeginHorizontal();
             if (Button("Endless Drop Table")) WikiTools.EndlessQuestDropTablesReadout();
             if (Button("Survivor Drop Table")) WikiTools.SurvivorQuestDropTablesReadout();

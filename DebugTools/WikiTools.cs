@@ -1,13 +1,9 @@
-﻿using CG;
-using CG.Client.UserData;
-using CG.Objects;
+﻿using CG.Client.UserData;
 using CG.Ship.Modules;
 using CG.Ship.Modules.Shield;
 using Gameplay.CompositeWeapons;
 using Gameplay.Damage;
 using Gameplay.Loot;
-using Gameplay.Quests;
-using HarmonyLib;
 using ResourceAssets;
 using System;
 using System.Collections.Generic;
@@ -35,13 +31,16 @@ namespace DebugTools
             ScriptableObjectReadout();
             EndlessQuestDropTablesReadout();
             SurvivorQuestDropTablesReadout();
+            ShieldsReadout();
+            KPDsReadout();
+            MissilesReadout();
+            ModulesReadout();
         }
 
         public static void DamageTablesReadout()
         {
+            BepinPlugin.Log.LogInfo("Starting Damage Tables Readout");
             List<string> lines = new();
-
-            //Damage Tables
             foreach (var thing in DamageTypesTable.Instance.DamageTypes)
             {
                 string values = string.Empty;
@@ -51,106 +50,180 @@ namespace DebugTools
                 }
                 lines.Add($"{thing.name}:{values}");
             }
-            WriteReadoutFile("DamageTables", lines.ToArray());
+            WriteReadoutFile("DamageTables.csv", lines.ToArray());
         }
 
         public static void WeaponModulesReadout(bool showDebugObjects = false)
         {
             BepinPlugin.Log.LogInfo("Starting CompositeWeaponDataDef Readout");
             List<string> lines = new();
-            foreach (CompositeWeaponDataDef compositeWeaponDataDef in ResourceAssetContainer<CompositeWeaponDataContainer, CompositeWeaponData, CompositeWeaponDataDef>.Instance.AssetDescriptions)
+            lines.Add("GUID,File Name,Display Name,Shop Category,Accuracy,Damage,Firerate,Range,Projectile Speed,Damage Type,Spread range,Spread Decrease Speed,Spread Increase Factor,Spread Decrease Factor");
+            foreach (CompositeWeaponDataDef compositeWeaponDataDef in CompositeWeaponDataContainer.Instance.RuntimeDescriptions)
             {
-                CompositeWeapon weapon = compositeWeaponDataDef.Asset.Data;
-                CompositeWeaponModule weaponModule = weapon.CoreElement.Asset;
-                WeaponFeederBase feeder = weapon.FeederElement.Asset;
-
-
                 if (!showDebugObjects && IsItemLocked(compositeWeaponDataDef.AssetGuid)) { continue; }
-                lines.Add($"{compositeWeaponDataDef.AssetGuid} {compositeWeaponDataDef.ContextInfo.HeaderText} {compositeWeaponDataDef.Ref.Filename} {compositeWeaponDataDef.Category}");
-                lines.Add($"{weaponModule.DisplayName}: Accuracy: {weaponModule.Accuracy.MinValue}-{weaponModule.Accuracy.MaxValue}, Damage: {weaponModule.Damage.MinValue}-{weaponModule.Damage.MaxValue}, FireRate: {weaponModule.FireRate.MinValue}-{weaponModule.FireRate.MaxValue}, Range: {weaponModule.Range.BaseValue}, Projectile Speed: {weaponModule.ProjectileSpeed.BaseValue}, Damage Type: {feeder.Projectile.Asset.DamageType.name}, SpreadRange: {feeder.SpreadBase}-{feeder.SpreadMax}; DecreaseSpeed - {feeder.SpreadDecreaseSpeed}; IncreaseSpeed - {feeder.SpreadIncreasePerSecond}; IncreaseFactor - {feeder.spreadIncreaseFactor}; DecreaseFactor - {feeder.spreadDecreaseFactor}");
+
+                CompositeWeapon weapon = compositeWeaponDataDef.Asset.Data;
+                WeaponFeederBase feeder = weapon.FeederElement.Asset;
+                BarrelStatDescriptor barrel = (BarrelStatDescriptor)weapon.BarrelStats.Asset;
+                ProjectileStatDescriptor projectileStats = (ProjectileStatDescriptor)weapon.ProjectileStats.Asset;
+                FeederStatDescriptor feederStats = (FeederStatDescriptor)weapon.FeederStats.Asset;
+                ForwardWeaponProjectile projectileElement = (ForwardWeaponProjectile)weapon.ProjectileElement.Asset;
+
+                try
+                {
+                    lines.Add($"{compositeWeaponDataDef.AssetGuid},{compositeWeaponDataDef.Ref.Filename},{compositeWeaponDataDef.Asset.DisplayName},{compositeWeaponDataDef.Category},{barrel.Accuracy.MinValue}-{barrel.Accuracy.MaxValue},{projectileStats.Damage.MinValue}-{projectileStats.Damage.MaxValue},{feederStats.FireRate.MinValue}-{feederStats.FireRate.MaxValue},{projectileStats.Range.BaseValue},{projectileStats.ProjectileSpeed.BaseValue},{projectileElement.DamageType.name},{feeder.SpreadBase}-{feeder.SpreadMax},{feeder.SpreadDecreaseSpeed},{feeder.SpreadIncreasePerSecond},{feeder.spreadIncreaseFactor},{feeder.spreadDecreaseFactor}");
+                }
+                catch(Exception ex)
+                {
+                    BepinPlugin.Log.LogWarning("Caught error while processing Weapon Modules readout\n" + ex.Message);
+                }
             }
-            WriteReadoutFile("WeaponModules", lines.ToArray());
+            WriteReadoutFile("WeaponModules.csv", lines.ToArray());
         }
 
         public static void CraftablesReadout(bool showDebugObjects = false)
         {
-            //Craftables
             BepinPlugin.Log.LogInfo("Starting CraftableItemDef Readout");
             List<string> lines = new();
-            foreach (CraftableItemDef craftableItemDef in ResourceAssetContainer<CraftingDataContainer, UnityEngine.Object, CraftableItemDef>.Instance.AssetDescriptions)
+            lines.Add("GUID,File Name,Display Name,Crafting Method,Craft Recipe,Recyclable");
+            foreach (CraftableItemDef craftableItemDef in CraftingDataContainer.Instance.RuntimeDescriptions)
             {
                 if (!showDebugObjects && IsItemLocked(craftableItemDef.AssetGuid)) { continue; }
-                lines.Add($"{craftableItemDef.AssetGuid} {craftableItemDef.ContextInfo.HeaderText} {craftableItemDef.Ref.Filename} {craftableItemDef.Category} Crafting: {craftableItemDef.crafting.CraftingMethod} {(craftableItemDef.crafting.CanBePrinted ? $"{craftableItemDef.crafting.Creation.Resource}-{craftableItemDef.crafting.Creation.Amount}" : craftableItemDef.crafting.CanBeInscribed ? $"MK{craftableItemDef.crafting.ItemExchangeInfo.MinimumRequiredTier} BlankBox" : string.Empty)}, Recyclable: {craftableItemDef.crafting.CanBeRecycled}:{craftableItemDef.crafting.Recycle.Resource}-{craftableItemDef.crafting.Recycle.Amount}");
+                lines.Add($"{craftableItemDef.AssetGuid},{craftableItemDef.Ref.Filename},{craftableItemDef.ContextInfo.HeaderText},{craftableItemDef.crafting.CraftingMethod},{(craftableItemDef.crafting.CanBePrinted ? $"{craftableItemDef.crafting.Creation.Resource}-{craftableItemDef.crafting.Creation.Amount}" : craftableItemDef.crafting.CanBeInscribed ? $"MK{craftableItemDef.crafting.ItemExchangeInfo.MinimumRequiredTier} BlankBox" : "No Recipe")},{craftableItemDef.crafting.CanBeRecycled}:{craftableItemDef.crafting.Recycle.Resource}-{craftableItemDef.crafting.Recycle.Amount}");
             }
-            WriteReadoutFile("Craftables", lines.ToArray());
+            WriteReadoutFile("Craftables.csv", lines.ToArray());
         }
 
         public static void UnlockablesReadout(bool showDebugObjects = false)
         {
-            //Unlockables
             BepinPlugin.Log.LogInfo("Starting UnlockItemDef Readout");
             List<string> lines = new();
-            foreach (UnlockItemDef unlockItemDef in ResourceAssetContainer<UnlockContainer, UnityEngine.Object, UnlockItemDef>.Instance.AssetDescriptions)
+            lines.Add("GUID,File Name,Name,Unlock Criteria,Rank Requirement,Rarity");
+            foreach (UnlockItemDef unlockItemDef in UnlockContainer.Instance.RuntimeDescriptions)
             {
                 if (!showDebugObjects && unlockItemDef.UnlockOptions.UnlockCriteria == UnlockCriteriaType.Never) { continue; }
-                lines.Add(unlockItemDef.AssetGuid + " " + unlockItemDef.Asset.name + " " + unlockItemDef.Ref.Filename + " " + unlockItemDef.UnlockOptions.UnlockCriteria.ToString() + " RankReq: " + unlockItemDef.UnlockOptions.RankRequirement.ToString() + " " + unlockItemDef.rarity.ToString());
+                lines.Add($"{unlockItemDef.AssetGuid},{unlockItemDef.Ref.Filename},{unlockItemDef.Asset.name},{unlockItemDef.UnlockOptions.UnlockCriteria},{unlockItemDef.UnlockOptions.RankRequirement},{unlockItemDef.rarity}");
             }
-            WriteReadoutFile("Unlockables", lines.ToArray());
+            WriteReadoutFile("Unlockables.csv", lines.ToArray());
         }
 
         public static void CarryablesReadout(bool showDebugObjects = false)
         {
-            //Carryables
             BepinPlugin.Log.LogInfo("Starting CarryableDef Readout");
             List<string> lines = new();
-            foreach (CarryableDef carryableDef in ResourceAssetContainer<CarryableContainer, CarryableObject, CarryableDef>.Instance.AssetDescriptions)
+            lines.Add("GUID,File Name,Display Name,Shop Category");
+            foreach (CarryableDef carryableDef in CarryableContainer.Instance.RuntimeDescriptions)
             {
                 if (!showDebugObjects && IsItemLocked(carryableDef.AssetGuid)) { continue; }
-                lines.Add(carryableDef.AssetGuid + " " + carryableDef.ContextInfo.HeaderText + " " + carryableDef.Ref.Filename + " " + carryableDef.Category.ToString());
+                lines.Add($"{carryableDef.AssetGuid},{carryableDef.Ref.Filename},{carryableDef.ContextInfo.HeaderText},{carryableDef.Category}");
             }
-            WriteReadoutFile("Carryables", lines.ToArray());
+            WriteReadoutFile("Carryables.csv", lines.ToArray());
         }
 
         public static void QuestAssetReadout()
         {
-            //QuestAssets
             BepinPlugin.Log.LogInfo("Starting QuestAssetDef Readout");
             List<string> lines = new();
-            foreach (QuestAssetDef questAssetDef in ResourceAssetContainer<QuestAssetContainer, QuestAsset, QuestAssetDef>.Instance.AssetDescriptions)
+            lines.Add("GUID,File Name,Display Name,Quest Type");
+            foreach (QuestAssetDef questAssetDef in QuestAssetContainer.Instance.RuntimeDescriptions)
             {
-                lines.Add(questAssetDef.AssetGuid + " " + questAssetDef.ContextInfo.HeaderText + " " + questAssetDef.Ref.Filename + " " + questAssetDef.Asset.QuestType);
+                lines.Add($"{questAssetDef.AssetGuid},{questAssetDef.Ref.Filename},{questAssetDef.ContextInfo.HeaderText},{questAssetDef.Asset.QuestType}");
             }
-            WriteReadoutFile("Quests", lines.ToArray());
+            WriteReadoutFile("Quests.csv", lines.ToArray());
         }
 
         public static void ClonestarObjectReadout()
         {
-            //CloneStar Objects.
             BepinPlugin.Log.LogInfo("Starting CloneStarObjectDef Readout");
             List<string> lines = new();
-            foreach (CloneStarObjectDef cloneStarObjectDef in ResourceAssetContainer<CloneStarObjectContainer, AbstractCloneStarObject, CloneStarObjectDef>.Instance.AssetDescriptions)
+            lines.Add("GUID,File Name,Display Name");
+            foreach (CloneStarObjectDef cloneStarObjectDef in CloneStarObjectContainer.Instance.RuntimeDescriptions)
             {
-                lines.Add(cloneStarObjectDef.AssetGuid + " " + cloneStarObjectDef.ContextInfo.HeaderText + " " + cloneStarObjectDef.Ref.Filename);
+                lines.Add($"{cloneStarObjectDef.AssetGuid},{cloneStarObjectDef.Ref.Filename},{cloneStarObjectDef.ContextInfo.HeaderText}");
             }
-            WriteReadoutFile("Clonestar Objects", lines.ToArray());
+            WriteReadoutFile("Clonestar Objects.csv", lines.ToArray());
         }
 
         public static void ScriptableObjectReadout()
         {
             BepinPlugin.Log.LogInfo("Starting ScriptableObjectDef Readout");
             List<string> lines = new();
-            foreach (ScriptableObjectDef thing in ScriptableObjectContainer.Instance.AssetDescriptions)
+            lines.Add("GUID,Path,Type");
+            foreach (ScriptableObjectDef thing in ScriptableObjectContainer.Instance.RuntimeDescriptions)
             {
-                lines.Add($"{thing.AssetGuid} {thing.GetType()} {thing.Path}");
+                lines.Add($"{thing.AssetGuid},{thing.Path},{thing.GetType()}");
             }
-            WriteReadoutFile("ScriptableObjects", lines.ToArray());
+            WriteReadoutFile("ScriptableObjects.csv", lines.ToArray());
+        }
+
+        public static void ShieldsReadout()
+        {
+            BepinPlugin.Log.LogInfo("Starting Shields Readout");
+            List<string> lines = new();
+            lines.Add("GUID,File Name,Display Name,Absorption,Recharge Delay,Recharge Speed,Hit Points");
+            foreach (ModuleDef moduleDef in ModuleContainer.Instance.RuntimeDescriptions)
+            {
+                if (moduleDef.Asset is ShieldModule shieldModule)
+                    lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{shieldModule.DisplayName},{shieldModule.shieldConfig.absorption},{shieldModule.shieldConfig.rechargeDelay},{shieldModule.shieldConfig.rechargeSpeed},{shieldModule.shieldConfig.hitPoints}");
+            }
+            WriteReadoutFile("ShieldGenerators.csv", lines.ToArray());
+        }
+
+        public static void KPDsReadout()
+        {
+            BepinPlugin.Log.LogInfo("Starting KPD Readout");
+            List<string> lines = new();
+            lines.Add("GUID,File Name,Display Name,Tracking Range,Burst Cooldown,Magazine Consumption Efficiency,Ammo Per Burst,Burst Duration,Target Loss Cooldown,Turret Tracking Angular Speed,Tracking Time Before Burst,Feeder Travel Duration");
+            foreach (ModuleDef moduleDef in ModuleContainer.Instance.RuntimeDescriptions)
+            {
+                if (moduleDef.Asset is KineticPointDefenseModule KPDModule)
+                    lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{KPDModule.DisplayName},{KPDModule.TrackingRange.Value},{KPDModule.CooldownAfterBurst.Value},{KPDModule.MagazineConsumptionEfficiency.Value},{KPDModule.AmmoUsedPerBurst},{KPDModule.BurstDuration},{KPDModule.CooldownAfterLossOfTarget},{KPDModule.TurretTrackingAngularSpeed},{KPDModule.TrackingTimeBeforeBurst},{KPDModule.FeederTravelDuration}");
+            }
+            WriteReadoutFile("KineticPointDefenceModules.csv", lines.ToArray());
+        }
+
+        public static void MissilesReadout()
+        {
+            BepinPlugin.Log.LogInfo("Starting Missile Readout");
+            List<string> lines = new();
+            lines.Add("GUID,File Name,Display Name");
+            foreach (CarryableDef moduleDef in CarryableContainer.Instance.RuntimeDescriptions)
+            {
+                if (moduleDef.Asset is not Payload payload || !payload.TryGetComponent<PayloadMissileGameplayEffect>(out var PMGE)) return;
+
+                Missile missile = PMGE.ReplacementObjects[0].Asset as Missile;
+
+                int projectileCount = PMGE.ReplacementObjects.Count;
+
+                if (missile is not AOEMissile aoeMissile)
+                {
+                    lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{PMGE.Payload.DisplayName}: {(projectileCount > 1 ? $"ProjectileCount: {projectileCount}," : string.Empty)} Range: {missile.Range.Value}, DamageType: {missile.DamageType.name}, Damage: {missile.Damage.Value}, TurningArcDistance: {missile.MovementArcLength}, Speed: {missile.Speed.Value}, ShootDelay: {missile.ShootDelaySeconds} SeekDelay: {missile.SeekDelaySeconds}, AngularMultiplier: {missile.angularMultiplier}");
+                }
+                else
+                {
+                    lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{PMGE.Payload.DisplayName}: Range: {missile.Range.Value}, DamageType: {missile.DamageType.name}, Damage: {missile.Damage.Value}, InnerRadius: {aoeMissile.InnerExplosionRadius}, OuterRadius: {aoeMissile.OuterExplosionRadius}, TurningArcDistance: {missile.MovementArcLength}, Speed: {missile.Speed.Value}, ShootDelay: {missile.ShootDelaySeconds} SeekDelay: {missile.SeekDelaySeconds}, AngularMultiplier: {missile.angularMultiplier}");
+                }
+            }
+            WriteReadoutFile("Missiles.csv", lines.ToArray());
+        }
+
+        public static void ModulesReadout()
+        {
+            BepinPlugin.Log.LogInfo("Starting Module Readout");
+            List<string> lines = new();
+            lines.Add("GUID,File Name,Display Name,Category");
+            foreach (ModuleDef moduleDef in ModuleContainer.Instance.RuntimeDescriptions)
+            {
+                lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{moduleDef.ContextInfo.HeaderText},{moduleDef.Category}");
+            }
+            WriteReadoutFile("Modules.csv", lines.ToArray());
         }
 
         public static void EndlessQuestDropTablesReadout()
         {
             BepinPlugin.Log.LogInfo("Starting Endless Drop Tables Readout");
 
-            DropTableReadout("EndlessPilgrimageLootTable", Game.EndlessQuestAsset.LootTable);
+            DropTableReadout("EndlessPilgrimage.csv", Game.EndlessQuestAsset.LootTable);
         }
 
         private static GUIDUnion SurvivorQuestGUID = new GUIDUnion("c3dcaf364807cae40b836a6ef6ebe748");
@@ -159,7 +232,7 @@ namespace DebugTools
         {
             BepinPlugin.Log.LogInfo("Starting Endless Drop Tables Readout");
 
-            DropTableReadout("SurvivorChallengLootTable", Game.GetQuestAsset(SurvivorQuestGUID).LootTable);
+            DropTableReadout("SurvivorChallenge.csv", Game.GetQuestAsset(SurvivorQuestGUID).LootTable);
         }
 
         /*private class DTEComparer : IComparer<LootTableEntry>
@@ -174,26 +247,34 @@ namespace DebugTools
         {
             List<string> lines = new();
 
-            lines.Add("Drop Chances Per Sector");
-            lines.Add("Rarity, Base Drop Limit, Drop Limit Positive Jitter");
-            foreach (var DropChances in lootTable.MaxDropsPerSectorPerRarity)
+            if (lootTable.useSectorDropAmountLimiters)
             {
-                lines.Add($"{DropChances.Key}, {DropChances.Value.MaxDropAmountBase}, {DropChances.Value.MaxDropAmountPositiveJitter}");
+                lines.Add("Drop Chances Per Sector");
+                lines.Add("Rarity, Base Drop Limit, Drop Limit Positive Jitter");
+                foreach (var DropChances in lootTable.MaxDropsPerSectorPerRarity)
+                {
+                    lines.Add($"{DropChances.Key}, {DropChances.Value.MaxDropAmountBase}, {DropChances.Value.MaxDropAmountPositiveJitter}");
+                }
+            }
+            else
+            {
+                lines.Add("Not using drop amount limits");
             }
 
-            lines.Add(string.Empty);
             lines.Add("Table Entries");
+            List<string> CSV = new();
+            CSV.Add("GUID,FileName,DisplayName,SpawnLocations,SpawnLimiters,Rarity,Amount");
             List<LootTableEntry> sorted = lootTable.Loot.ToList();
             sorted.Sort((x, y) => x.LootRarity - y.LootRarity);
             foreach (LootTableEntry LTEntry in sorted)
             {
-                lines.Add($"{LTEntry.ItemRef.AssetGuid} {LTEntry.ItemRef.Filename} {CraftingDataContainer.Instance.GetAssetDefById(LTEntry.ItemRef.AssetGuid).ContextInfo.HeaderText} SpawnLocations:{ListEnums(LTEntry.PossibleSpawnLocationTypes)} SpawnLimiters: {LTEntry.LootSpawnLimiters.Length} Rarity: {LTEntry.LootRarity} Amount: {LTEntry.Amount}");
+                CSV.Add($"{LTEntry.ItemRef.AssetGuid},{LTEntry.ItemRef.Filename},{CraftingDataContainer.Instance.GetAssetDefById(LTEntry.ItemRef.AssetGuid).ContextInfo.HeaderText},{ListEnums(LTEntry.PossibleSpawnLocationTypes)},{LTEntry.LootSpawnLimiters.Length},{LTEntry.LootRarity},{LTEntry.Amount}");
             }
 
-            lines.Add(string.Empty);
             lines.Add(Game.GetQuestAsset(SurvivorQuestGUID).LootTable.DropChancesText());
 
-            WriteReadoutFile(OutputName, lines.ToArray());
+            WriteReadoutFile(OutputName + "LootData.txt", lines.ToArray());
+            WriteReadoutFile(OutputName + "LootTable.csv", CSV.ToArray());
         }
 
         public static string ListEnums(LootSpawnLocationType LootLocations)
@@ -222,7 +303,7 @@ namespace DebugTools
             Directory.CreateDirectory(WikiReadoutDirectory);
 
             // Write the string array to a new file named "WriteLines.txt".
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(WikiReadoutDirectory, $"{fileName}.txt")))
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(WikiReadoutDirectory, fileName)))
             {
                 foreach (string line in lines)
                     outputFile.WriteLine(line);
@@ -244,7 +325,7 @@ namespace DebugTools
         }
     }*/
 
-    [HarmonyPatch(typeof(ShieldModule), "ToggleShield")]
+    /*[HarmonyPatch(typeof(ShieldModule), "ToggleShield")]
     class ShieldStatsPatch
     {
         static void Postfix(ShieldModule __instance)
@@ -254,9 +335,9 @@ namespace DebugTools
                 BepinPlugin.Log.LogInfo($"{__instance.DisplayName}: Absorption: {__instance.shieldConfig.absorption}, Recharge Delay: {__instance.shieldConfig.rechargeDelay}, Recharge Speed: {__instance.shieldConfig.rechargeSpeed}, Hit Points: {__instance.shieldConfig.hitPoints}");
             }
         }
-    }
+    }*/
 
-    [HarmonyPatch(typeof(KineticPointDefenseModule), "EnterStateOn")]
+    /*[HarmonyPatch(typeof(KineticPointDefenseModule), "EnterStateOn")]
     class KPDStatsPatch
     {
         static void Postfix(KineticPointDefenseModule __instance)
@@ -266,8 +347,9 @@ namespace DebugTools
                 BepinPlugin.Log.LogInfo($"{__instance.DisplayName}: TrackingRange: {__instance.TrackingRange.Value}, CooldownAfterBurst: {__instance.CooldownAfterBurst.Value}, MagazineConsumptionEfficiency: {__instance.MagazineConsumptionEfficiency.Value}, AmmoUsedPerBurst: {__instance.AmmoUsedPerBurst}, BurstDuration: {__instance.BurstDuration}, CooldownAfterLossOfTarget: {__instance.CooldownAfterLossOfTarget}, TurretTrackingAngularSpeed: {__instance.TurretTrackingAngularSpeed}, TrackingTimeBeforeBurst: {__instance.TrackingTimeBeforeBurst}, FeederTravelDuration: {__instance.FeederTravelDuration}");
             }
         }
-    }
+    }*/
 
+    /*
     [HarmonyPatch(typeof(PayloadMissileGameplayEffect), "OnAwake")]
     class MissilePatch
     {
@@ -290,5 +372,5 @@ namespace DebugTools
                 }
             }
         }
-    }
+    }*/
 }
