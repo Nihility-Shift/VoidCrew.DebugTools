@@ -67,7 +67,7 @@ namespace DebugTools
                 BarrelStatDescriptor barrel = (BarrelStatDescriptor)weapon.BarrelStats.Asset;
                 ProjectileStatDescriptor projectileStats = (ProjectileStatDescriptor)weapon.ProjectileStats.Asset;
                 FeederStatDescriptor feederStats = (FeederStatDescriptor)weapon.FeederStats.Asset;
-                ForwardWeaponProjectile projectileElement = (ForwardWeaponProjectile)weapon.ProjectileElement.Asset;
+                WeaponProjectile projectileElement = weapon.ProjectileElement.Asset;
 
                 try
                 {
@@ -75,7 +75,7 @@ namespace DebugTools
                 }
                 catch(Exception ex)
                 {
-                    BepinPlugin.Log.LogWarning("Caught error while processing Weapon Modules readout\n" + ex.Message);
+                    BepinPlugin.Log.LogWarning($"Caught error while processing Weapon Modules readout for {compositeWeaponDataDef.Ref.Filename}\n{ex.Message}");
                 }
             }
             WriteReadoutFile("WeaponModules.csv", lines.ToArray());
@@ -244,6 +244,9 @@ namespace DebugTools
         public static void DropTableReadout(string OutputName, LootTable lootTable)
         {
             List<string> lines = new();
+            List<string> CSV = new();
+            List<LootTableEntry> sorted = lootTable.Loot.ToList();
+            sorted.Sort((x, y) => x.LootRarity - y.LootRarity);
 
             if (lootTable.useSectorDropAmountLimiters)
             {
@@ -258,14 +261,10 @@ namespace DebugTools
             {
                 lines.Add("Not using drop amount limits");
             }
+            lines.Add(string.Empty);
 
             // CSV Table
-            lines.Add("Table Entries");
-            List<string> CSV = new();
             CSV.Add("GUID,FileName,DisplayName,SpawnLocations,SpawnLimiters,Rarity,Amount");
-
-            List<LootTableEntry> sorted = lootTable.Loot.ToList();
-            sorted.Sort((x, y) => x.LootRarity - y.LootRarity);
 
             foreach (LootTableEntry LTEntry in sorted)
             {
