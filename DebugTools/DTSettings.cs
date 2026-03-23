@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Diagnostics;
+using System.IO;
+using UnityEngine;
 using VoidManager.CustomGUI;
 using VoidManager.Progression;
 using static UnityEngine.GUILayout;
@@ -14,11 +16,13 @@ namespace DebugTools
         public const string WeaponBoxesLabel = "WeaponBuildboxes";
         public const string CarryablesLabel = "Carryables";
 
+        bool WikiDebugItems = false;
+
         public override void Draw()
         {
             // Spawn Menu Section
             BeginHorizontal();
-            if (DrawButtonSelected("Toggle Spawn Menu"), DTGUI.Instance.GUIActive) DTGUI.Instance.GUIActive = !DTGUI.Instance.GUIActive;
+            if (DrawButtonSelected("Toggle Spawn Menu", DTGUI.Instance.GUIActive)) DTGUI.Instance.GUIActive = !DTGUI.Instance.GUIActive;
             if (Button("Reset Position")) DTGUI.Instance.WindowRect.position = new Vector2(0, 0);
             DrawChangeKeybindButton("Keybind", ref Configs.OpenMenu);
             DrawCheckbox("Menu Unlocks Cursor", ref Configs.MenuUnlockCursor);
@@ -46,6 +50,31 @@ namespace DebugTools
             }
             else
                 Label(string.Empty);
+
+            FlexibleSpace();
+
+            // WikiTools Section;
+            Label("Wiki Readouts");
+            WikiDebugItems = Toggle(WikiDebugItems, "Output Debug Items");
+
+            if (Button("All")) WikiTools.AllReadouts(WikiDebugItems);
+            if (Button("Weapon Modules")) WikiTools.WeaponModulesReadout(WikiDebugItems);
+            if (Button("Carryables")) WikiTools.CarryablesReadout(WikiDebugItems);
+            if (Button("Unlockables")) WikiTools.UnlockablesReadout(WikiDebugItems);
+            if (Button("Damage Tables")) WikiTools.DamageTablesReadout();
+            if (Button("Clonestar Objects")) WikiTools.ClonestarObjectReadout();
+            if (Button("Craftables")) WikiTools.CraftablesReadout(WikiDebugItems);
+            if (Button("Quest Assets")) WikiTools.QuestAssetReadout();
+            if (Button("Scriptable Objects")) WikiTools.ScriptableObjectReadout();
+            BeginHorizontal();
+            if (Button("Endless Drop Table")) WikiTools.EndlessQuestDropTablesReadout();
+            if (Button("Survivor Drop Table")) WikiTools.SurvivorQuestDropTablesReadout();
+            EndHorizontal();
+
+            if (Directory.Exists(WikiTools.WikiReadoutDirectory) && Button("Open Folder"))
+            {
+                Process.Start(WikiTools.WikiReadoutDirectory);
+            }
         }
 
         bool DPCheck = false;

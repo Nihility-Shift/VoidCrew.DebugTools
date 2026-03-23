@@ -1,5 +1,4 @@
 ﻿using BepInEx;
-using CG.Client.UserData;
 using CG.Game.Player;
 using CG.Input;
 using CG.Network;
@@ -11,6 +10,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using static DebugTools.Common;
 using static UnityEngine.GUILayout;
 using static VoidManager.Utilities.GUITools;
 
@@ -218,16 +218,6 @@ namespace DebugTools
                     ObjectFactory.InstantiateSpaceObjectByGUID(CWBB.assetGuid, Spawnpos, default, new Dictionary<byte, object> { { 0, JObject.FromObject(spawnData.Ref).ToString(Formatting.None, Array.Empty<JsonConverter>()) } });
                 }
             }
-        }
-
-        /// <summary>
-        /// Checks if an item's Unlock Entry does not exist or is permanently locked.
-        /// </summary>
-        /// <param name="GUID"></param>
-        /// <returns></returns>
-        public static bool IsItemLocked(GUIDUnion GUID)
-        {
-            return !UnlockContainer.Instance.TryGetByGuid(GUID, out UnlockItemDef value) || value.unlockOptions.UnlockCriteria == UnlockCriteriaType.Never;
         }
 
         public static void CacheSpawnables()

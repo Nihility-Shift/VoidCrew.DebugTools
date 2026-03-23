@@ -33,6 +33,11 @@
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="VoidCrewCommon">
+      <HintPath>C:\Users\1redy\.nuget\packages\voidcrew.gamelibs\1.2.4\lib\VoidCrewCommon.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
     <Reference Update="mscorlib">
       <Private>False</Private>
     </Reference>
