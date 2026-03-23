@@ -186,22 +186,20 @@ namespace DebugTools
         {
             BepinPlugin.Log.LogInfo("Starting Missile Readout");
             List<string> lines = new();
-            lines.Add("GUID,File Name,Display Name");
+            lines.Add("GUID,File Name,Display Name,Projectile Count,Missile Range,Damage Type,Damage,Turning Arc Distance,Speed,Shoot Delay,Seek Delay,Angular Multiplier,Inner Radius, Outer Radius");
             foreach (CarryableDef moduleDef in CarryableContainer.Instance.RuntimeDescriptions)
             {
                 if (moduleDef.Asset is not Payload payload || !payload.TryGetComponent<PayloadMissileGameplayEffect>(out var PMGE)) return;
 
                 Missile missile = PMGE.ReplacementObjects[0].Asset as Missile;
 
-                int projectileCount = PMGE.ReplacementObjects.Count;
-
                 if (missile is not AOEMissile aoeMissile)
                 {
-                    lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{PMGE.Payload.DisplayName}: {(projectileCount > 1 ? $"ProjectileCount: {projectileCount}," : string.Empty)} Range: {missile.Range.Value}, DamageType: {missile.DamageType.name}, Damage: {missile.Damage.Value}, TurningArcDistance: {missile.MovementArcLength}, Speed: {missile.Speed.Value}, ShootDelay: {missile.ShootDelaySeconds} SeekDelay: {missile.SeekDelaySeconds}, AngularMultiplier: {missile.angularMultiplier}");
+                    lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{PMGE.Payload.DisplayName},{PMGE.ReplacementObjects.Count},{missile.Range.Value},{missile.DamageType.name},{missile.Damage.Value},{missile.MovementArcLength},{missile.Speed.Value},{missile.ShootDelaySeconds},{missile.SeekDelaySeconds},{missile.angularMultiplier}");
                 }
                 else
                 {
-                    lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{PMGE.Payload.DisplayName}: Range: {missile.Range.Value}, DamageType: {missile.DamageType.name}, Damage: {missile.Damage.Value}, InnerRadius: {aoeMissile.InnerExplosionRadius}, OuterRadius: {aoeMissile.OuterExplosionRadius}, TurningArcDistance: {missile.MovementArcLength}, Speed: {missile.Speed.Value}, ShootDelay: {missile.ShootDelaySeconds} SeekDelay: {missile.SeekDelaySeconds}, AngularMultiplier: {missile.angularMultiplier}");
+                    lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{PMGE.Payload.DisplayName},{PMGE.ReplacementObjects.Count},{missile.Range.Value},{missile.DamageType.name},{missile.Damage.Value},{missile.MovementArcLength},{missile.Speed.Value},{missile.ShootDelaySeconds},{missile.SeekDelaySeconds},{missile.angularMultiplier},{aoeMissile.InnerExplosionRadius},{aoeMissile.OuterExplosionRadius}");
                 }
             }
             WriteReadoutFile("Missiles.csv", lines.ToArray());
@@ -261,16 +259,20 @@ namespace DebugTools
                 lines.Add("Not using drop amount limits");
             }
 
+            // CSV Table
             lines.Add("Table Entries");
             List<string> CSV = new();
             CSV.Add("GUID,FileName,DisplayName,SpawnLocations,SpawnLimiters,Rarity,Amount");
+
             List<LootTableEntry> sorted = lootTable.Loot.ToList();
             sorted.Sort((x, y) => x.LootRarity - y.LootRarity);
+
             foreach (LootTableEntry LTEntry in sorted)
             {
                 CSV.Add($"{LTEntry.ItemRef.AssetGuid},{LTEntry.ItemRef.Filename},{CraftingDataContainer.Instance.GetAssetDefById(LTEntry.ItemRef.AssetGuid).ContextInfo.HeaderText},{ListEnums(LTEntry.PossibleSpawnLocationTypes)},{LTEntry.LootSpawnLimiters.Length},{LTEntry.LootRarity},{LTEntry.Amount}");
             }
 
+            // Dev Drop Chances Calc
             lines.Add(Game.GetQuestAsset(SurvivorQuestGUID).LootTable.DropChancesText());
 
             WriteReadoutFile(OutputName + "LootData.txt", lines.ToArray());
