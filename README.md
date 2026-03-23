@@ -4,7 +4,7 @@
 
 # Debug Tools
 
-Version 0.0.2  
+Version 0.0.3  
 For Game Version 1.3.0  
 Developed by Dragon  
 Requires:  BepInEx-BepInExPack-5.4.2305, NihilityShift-VoidManager-1.2.11

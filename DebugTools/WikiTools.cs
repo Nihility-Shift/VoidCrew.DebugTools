@@ -35,6 +35,7 @@ namespace DebugTools
             KPDsReadout();
             MissilesReadout();
             ModulesReadout();
+            DeathLootReadout();
         }
 
         public static void DamageTablesReadout()
@@ -217,6 +218,48 @@ namespace DebugTools
             WriteReadoutFile("Modules.csv", lines.ToArray());
         }
 
+        public static void DeathLootReadout()
+        {
+            BepinPlugin.Log.LogInfo("Starting Death Loot Readout");
+            List<string> lines = new();
+            lines.Add("GUID\tFile Name\tSpawn Radius\tSpawn Velocity\tSpawn Torque\tEject Angle\tUses Sector Loot Table\tUses Custom Loot Table\tSpawns Predefined Item\tPredefined Spawn Count\tPredefined Spawn GUID\tSector Loot Table Configs\tCustom Loot Table Configs\tCustom Loot Table Name");
+            HashSet<LootTable> CustomTables = new();
+            foreach (var thing in LootOnDeathDropperContainer.Instance.RuntimeDescriptions)
+            {
+                string customTableNames = string.Empty;
+                foreach(var table in thing.Asset.customLootTables)
+                {
+                    CustomTables.Add(table);
+                    customTableNames += table.name + ",";
+                }
+                lines.Add($"{thing.AssetGuid}\t{thing.Ref.Filename}\t{thing.Asset.spawnRadius}\t{thing.Asset.spawnVelocity}\t{thing.Asset.spawnTorque}\t{thing.Asset.ejectAngle}\t{thing.Asset.spawnsLootFromSectorTable}\t{thing.Asset.spawnsLootFromCustomTables}\t{thing.Asset.spawnPredefinedItems}\t{thing.Asset.predefinedItemsSpawnAmount}\t{thing.Asset.predefinedItemsToSpawn}\t{ListLootRollConfig(thing.LootRollAttempts)}\t{ListLootRollConfig(thing.Asset.customLootTablesRolls)}\t{customTableNames}");
+            }
+            WriteReadoutFile("DeathLoot.tsv", lines.ToArray());
+
+            foreach (LootTable customTable in CustomTables)
+            {
+                DropTableReadout($"{customTable.name}Custom", customTable);
+            }
+        }
+
+        private static string ListLootRollConfig(List<LootRollConfig> configs)
+        {
+            string output = string.Empty;
+            var copy = configs.ToList();
+            copy.Sort((LootRollConfig x, LootRollConfig y) => x.Rarity - y.Rarity);
+
+            foreach (var config in copy)
+            {
+                output += $"{LootConfigToString(config)};";
+            }
+            return output;
+        }
+
+        private static string LootConfigToString(LootRollConfig lrc)
+        {
+            return $"{lrc.Rarity},{lrc.ChanceToRollLoot},{lrc.RollCount}";
+        }
+
         public static void EndlessQuestDropTablesReadout()
         {
             BepinPlugin.Log.LogInfo("Starting Endless Drop Tables Readout");
@@ -256,7 +299,7 @@ namespace DebugTools
             lines.Add(string.Empty);
 
             // CSV Table
-            CSV.Add("GUID,FileName,DisplayName,SpawnLocations,SpawnLimiters,Rarity,Amount");
+            CSV.Add("GUID,File Name,Display Name,Spawn Locations,Spawn Limiters,Rarity,Amount");
 
             foreach (LootTableEntry LTEntry in sorted)
             {
@@ -264,7 +307,7 @@ namespace DebugTools
             }
 
             // Dev Drop Chances Calc
-            lines.Add(Game.GetQuestAsset(SurvivorQuestGUID).LootTable.DropChancesText());
+            lines.Add(lootTable.DropChancesText());
 
             WriteReadoutFile(OutputName + "LootData.txt", lines.ToArray());
             WriteReadoutFile(OutputName + "LootTable.csv", CSV.ToArray());
@@ -304,7 +347,7 @@ namespace DebugTools
                     setFlags += $" {flag}";
                 }
             }
-            return setFlags;
+            return setFlags.Trim();
         }
 
         // Getter since static string defaulted to Void Crew parent folder.
