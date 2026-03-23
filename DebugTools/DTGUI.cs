@@ -204,11 +204,7 @@ namespace DebugTools
                 Transform camera = Camera.main.gameObject.transform;
                 Vector3 Spawnpos = camera.position + camera.forward * DistanceOffset; // Vector3.up keeps it from being feet level.
 
-                if (spawnData.Runtime)
-                {
-                    ObjectFactory.InstantiateRuntimeObject(spawnData.GUID, Spawnpos, default);
-                }
-                else if (spawnData.SpawnType == SpawnType.Carryable)
+                if (spawnData.SpawnType == SpawnType.Carryable)
                 {
                     ObjectFactory.InstantiateSpaceObjectByGUID(spawnData.GUID, Spawnpos, default);
                 }
@@ -224,7 +220,7 @@ namespace DebugTools
         {
             Spawnables.Clear();
 
-            foreach (var AssetGUIDPair in CarryableContainer.Instance.RuntimeDescriptions)
+            foreach (var AssetGUIDPair in CarryableContainer.Instance.AssetDescriptions)
             {
                 Spawnables.Add(new SpawnEntry(
                     AssetGUIDPair.ContextInfo,
@@ -233,7 +229,7 @@ namespace DebugTools
                 );
             }
 
-            foreach (var AssetGUIDPair in CompositeWeaponDataContainer.Instance.RuntimeDescriptions)
+            foreach (var AssetGUIDPair in CompositeWeaponDataContainer.Instance.AssetDescriptions)
             {
                 Spawnables.Add(new SpawnEntry(
                     AssetGUIDPair.ContextInfo,
@@ -275,7 +271,7 @@ namespace DebugTools
                 FileName = assetRef.Filename;
                 GUID = assetRef.AssetGuid;
                 LockedDevItem = IsItemLocked(GUID);
-                Runtime = assetRef.IsRuntime;
+                Runtime = false;
                 SpawnType = spawnType;
 
                 SEContent = new GUIContent($"{Context.HeaderText}\n{FileName}", Context.BodyText);

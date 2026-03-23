@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using VC.Common.CoreData;
 using VoidManager.Utilities;
 using static DebugTools.Common;
 
@@ -59,7 +58,7 @@ namespace DebugTools
             BepinPlugin.Log.LogInfo("Starting CompositeWeaponDataDef Readout");
             List<string> lines = new();
             lines.Add("GUID,File Name,Display Name,Shop Category,Accuracy,Damage,Firerate,Range,Projectile Speed,Damage Type,Spread range,Spread Decrease Speed,Spread Increase Factor,Spread Decrease Factor");
-            foreach (CompositeWeaponDataDef compositeWeaponDataDef in CompositeWeaponDataContainer.Instance.RuntimeDescriptions)
+            foreach (CompositeWeaponDataDef compositeWeaponDataDef in CompositeWeaponDataContainer.Instance.AssetDescriptions)
             {
                 if (!showDebugObjects && IsItemLocked(compositeWeaponDataDef.AssetGuid)) { continue; }
 
@@ -87,7 +86,7 @@ namespace DebugTools
             BepinPlugin.Log.LogInfo("Starting CraftableItemDef Readout");
             List<string> lines = new();
             lines.Add("GUID,File Name,Display Name,Crafting Method,Craft Recipe,Recyclable");
-            foreach (CraftableItemDef craftableItemDef in CraftingDataContainer.Instance.RuntimeDescriptions)
+            foreach (CraftableItemDef craftableItemDef in CraftingDataContainer.Instance.AssetDescriptions)
             {
                 if (!showDebugObjects && IsItemLocked(craftableItemDef.AssetGuid)) { continue; }
                 lines.Add($"{craftableItemDef.AssetGuid},{craftableItemDef.Ref.Filename},{craftableItemDef.ContextInfo.HeaderText},{craftableItemDef.crafting.CraftingMethod},{(craftableItemDef.crafting.CanBePrinted ? $"{craftableItemDef.crafting.Creation.Resource}-{craftableItemDef.crafting.Creation.Amount}" : craftableItemDef.crafting.CanBeInscribed ? $"MK{craftableItemDef.crafting.ItemExchangeInfo.MinimumRequiredTier} BlankBox" : "No Recipe")},{craftableItemDef.crafting.CanBeRecycled}:{craftableItemDef.crafting.Recycle.Resource}-{craftableItemDef.crafting.Recycle.Amount}");
@@ -100,7 +99,7 @@ namespace DebugTools
             BepinPlugin.Log.LogInfo("Starting UnlockItemDef Readout");
             List<string> lines = new();
             lines.Add("GUID,File Name,Name,Unlock Criteria,Rank Requirement,Rarity");
-            foreach (UnlockItemDef unlockItemDef in UnlockContainer.Instance.RuntimeDescriptions)
+            foreach (UnlockItemDef unlockItemDef in UnlockContainer.Instance.AssetDescriptions)
             {
                 if (!showDebugObjects && unlockItemDef.UnlockOptions.UnlockCriteria == UnlockCriteriaType.Never) { continue; }
                 lines.Add($"{unlockItemDef.AssetGuid},{unlockItemDef.Ref.Filename},{unlockItemDef.Asset.name},{unlockItemDef.UnlockOptions.UnlockCriteria},{unlockItemDef.UnlockOptions.RankRequirement},{unlockItemDef.rarity}");
@@ -113,7 +112,7 @@ namespace DebugTools
             BepinPlugin.Log.LogInfo("Starting CarryableDef Readout");
             List<string> lines = new();
             lines.Add("GUID,File Name,Display Name,Shop Category");
-            foreach (CarryableDef carryableDef in CarryableContainer.Instance.RuntimeDescriptions)
+            foreach (CarryableDef carryableDef in CarryableContainer.Instance.AssetDescriptions)
             {
                 if (!showDebugObjects && IsItemLocked(carryableDef.AssetGuid)) { continue; }
                 lines.Add($"{carryableDef.AssetGuid},{carryableDef.Ref.Filename},{carryableDef.ContextInfo.HeaderText},{carryableDef.Category}");
@@ -126,7 +125,7 @@ namespace DebugTools
             BepinPlugin.Log.LogInfo("Starting QuestAssetDef Readout");
             List<string> lines = new();
             lines.Add("GUID,File Name,Display Name,Quest Type");
-            foreach (QuestAssetDef questAssetDef in QuestAssetContainer.Instance.RuntimeDescriptions)
+            foreach (QuestAssetDef questAssetDef in QuestAssetContainer.Instance.AssetDescriptions)
             {
                 lines.Add($"{questAssetDef.AssetGuid},{questAssetDef.Ref.Filename},{questAssetDef.ContextInfo.HeaderText},{questAssetDef.Asset.QuestType}");
             }
@@ -138,7 +137,7 @@ namespace DebugTools
             BepinPlugin.Log.LogInfo("Starting CloneStarObjectDef Readout");
             List<string> lines = new();
             lines.Add("GUID,File Name,Display Name");
-            foreach (CloneStarObjectDef cloneStarObjectDef in CloneStarObjectContainer.Instance.RuntimeDescriptions)
+            foreach (CloneStarObjectDef cloneStarObjectDef in CloneStarObjectContainer.Instance.AssetDescriptions)
             {
                 lines.Add($"{cloneStarObjectDef.AssetGuid},{cloneStarObjectDef.Ref.Filename},{cloneStarObjectDef.ContextInfo.HeaderText}");
             }
@@ -150,7 +149,7 @@ namespace DebugTools
             BepinPlugin.Log.LogInfo("Starting ScriptableObjectDef Readout");
             List<string> lines = new();
             lines.Add("GUID,Path,Type");
-            foreach (ScriptableObjectDef thing in ScriptableObjectContainer.Instance.RuntimeDescriptions)
+            foreach (ScriptableObjectDef thing in ScriptableObjectContainer.Instance.AssetDescriptions)
             {
                 lines.Add($"{thing.AssetGuid},{thing.Path},{thing.GetType()}");
             }
@@ -162,7 +161,7 @@ namespace DebugTools
             BepinPlugin.Log.LogInfo("Starting Shields Readout");
             List<string> lines = new();
             lines.Add("GUID,File Name,Display Name,Absorption,Recharge Delay,Recharge Speed,Hit Points");
-            foreach (ModuleDef moduleDef in ModuleContainer.Instance.RuntimeDescriptions)
+            foreach (ModuleDef moduleDef in ModuleContainer.Instance.AssetDescriptions)
             {
                 if (moduleDef.Asset is ShieldModule shieldModule)
                     lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{shieldModule.DisplayName},{shieldModule.shieldConfig.absorption},{shieldModule.shieldConfig.rechargeDelay},{shieldModule.shieldConfig.rechargeSpeed},{shieldModule.shieldConfig.hitPoints}");
@@ -175,7 +174,7 @@ namespace DebugTools
             BepinPlugin.Log.LogInfo("Starting KPD Readout");
             List<string> lines = new();
             lines.Add("GUID,File Name,Display Name,Tracking Range,Burst Cooldown,Magazine Consumption Efficiency,Ammo Per Burst,Burst Duration,Target Loss Cooldown,Turret Tracking Angular Speed,Tracking Time Before Burst,Feeder Travel Duration");
-            foreach (ModuleDef moduleDef in ModuleContainer.Instance.RuntimeDescriptions)
+            foreach (ModuleDef moduleDef in ModuleContainer.Instance.AssetDescriptions)
             {
                 if (moduleDef.Asset is KineticPointDefenseModule KPDModule)
                     lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{KPDModule.DisplayName},{KPDModule.TrackingRange.Value},{KPDModule.CooldownAfterBurst.Value},{KPDModule.MagazineConsumptionEfficiency.Value},{KPDModule.AmmoUsedPerBurst},{KPDModule.BurstDuration},{KPDModule.CooldownAfterLossOfTarget},{KPDModule.TurretTrackingAngularSpeed},{KPDModule.TrackingTimeBeforeBurst},{KPDModule.FeederTravelDuration}");
@@ -188,7 +187,7 @@ namespace DebugTools
             BepinPlugin.Log.LogInfo("Starting Missile Readout");
             List<string> lines = new();
             lines.Add("GUID,File Name,Display Name,Projectile Count,Missile Range,Damage Type,Damage,Turning Arc Distance,Speed,Shoot Delay,Seek Delay,Angular Multiplier,Inner Radius, Outer Radius");
-            foreach (CarryableDef moduleDef in CarryableContainer.Instance.RuntimeDescriptions)
+            foreach (CarryableDef moduleDef in CarryableContainer.Instance.AssetDescriptions)
             {
                 if (moduleDef.Asset is not Payload payload || !payload.TryGetComponent<PayloadMissileGameplayEffect>(out var PMGE)) return;
 
@@ -211,7 +210,7 @@ namespace DebugTools
             BepinPlugin.Log.LogInfo("Starting Module Readout");
             List<string> lines = new();
             lines.Add("GUID,File Name,Display Name,Category");
-            foreach (ModuleDef moduleDef in ModuleContainer.Instance.RuntimeDescriptions)
+            foreach (ModuleDef moduleDef in ModuleContainer.Instance.AssetDescriptions)
             {
                 lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{moduleDef.ContextInfo.HeaderText},{moduleDef.Category}");
             }
