@@ -7,33 +7,29 @@
 Version 0.0.2  
 For Game Version 1.3.0  
 Developed by Dragon  
-Requires:  BepInEx-BepInExPack-5.4.2304, NihilityShift-VoidManager-1.2.11
+Requires:  BepInEx-BepInExPack-5.4.2305, NihilityShift-VoidManager-1.2.11
 
 
 ---------------------
 
 ### 💡 Function(s)
 
-- A collection of debug and wiki tools for Void Crew
+- Spawns items, both vanilla and modded.
+- Provides button for disabling progress in Settings menu.
+- Provides buttons for generating wiki readouts.
 
 ### 🎮 Client Usage
 
-- 
+- F5 Menu > Settings > Debug Tools
+  - Configure settings and generate wiki readouts
+- Toggle spawning menu (Default F10) for a list of items to spawn.
 
 ### 👥 Multiplayer Functionality
 
-# Note to mod developer: Remove all but those which match, and describe any custom functionality.
-- ✅ Client
-  - Only the client needs this mod.
 - ✅ Host
-  - Only the host needs this mod.
+  - The host must have this mod for spawning objects.
 - ✅ Session
-  - Requires the room to be marked as Mod_Session for functionality.
-  - Requires the room to be marked as Mod_Session for joining.
-  - Marks the room as Mod_Session when starting session as host.
   - Marks the room as Mod_Session when hosting.
-- ✅ All
-  - All players must have this mod installed.
 
 ---------------------
 

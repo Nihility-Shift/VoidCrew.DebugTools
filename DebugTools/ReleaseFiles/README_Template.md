@@ -14,26 +14,22 @@ Requires: [Dependencies]
 
 ### 💡 Function(s)
 
-- [Description]
+- Spawns items, both vanilla and modded.
+- Provides button for disabling progress in Settings menu.
+- Provides buttons for generating wiki readouts.
 
 ### 🎮 Client Usage
 
-- 
+- F5 Menu > Settings > Debug Tools
+  - Configure settings and generate wiki readouts
+- Toggle spawning menu (Default F10) for a list of items to spawn.
 
 ### 👥 Multiplayer Functionality
 
-# Note to mod developer: Remove all but those which match, and describe any custom functionality.
-- ✅ Client
-  - Only the client needs this mod.
 - ✅ Host
-  - Only the host needs this mod.
+  - The host must have this mod for spawning objects.
 - ✅ Session
-  - Requires the room to be marked as Mod_Session for functionality.
-  - Requires the room to be marked as Mod_Session for joining.
-  - Marks the room as Mod_Session when starting session as host.
   - Marks the room as Mod_Session when hosting.
-- ✅ All
-  - All players must have this mod installed.
 
 ---------------------
 
