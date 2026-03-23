@@ -300,7 +300,7 @@ namespace DebugTools
             lines.Add(string.Empty);
 
             // CSV Table
-            CSV.Add("GUID,FileName,DisplayName,SpawnLocations,SpawnLimiters,Rarity,Amount");
+            CSV.Add("GUID,File Name,Display Name,Spawn Locations,Spawn Limiters,Rarity,Amount");
 
             foreach (LootTableEntry LTEntry in sorted)
             {
@@ -348,7 +348,7 @@ namespace DebugTools
                     setFlags += $" {flag}";
                 }
             }
-            return setFlags;
+            return setFlags.Trim();
         }
 
         // Getter since static string defaulted to Void Crew parent folder.
