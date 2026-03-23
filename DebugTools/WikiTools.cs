@@ -224,7 +224,7 @@ namespace DebugTools
             List<string> lines = new();
             lines.Add("GUID\tFile Name\tSpawn Radius\tSpawn Velocity\tSpawn Torque\tEject Angle\tUses Sector Loot Table\tUses Custom Loot Table\tSpawns Predefined Item\tPredefined Spawn Count\tPredefined Spawn GUID\tSector Loot Table Configs\tCustom Loot Table Configs\tCustom Loot Table Name");
             HashSet<LootTable> CustomTables = new();
-            foreach (var thing in LootOnDeathDropperContainer.Instance.RuntimeDescriptions)
+            foreach (var thing in LootOnDeathDropperContainer.Instance.AssetDescriptions)
             {
                 string customTableNames = string.Empty;
                 foreach(var table in thing.Asset.customLootTables)
