@@ -51,7 +51,7 @@ namespace DebugTools
                 }
                 lines.Add($"{thing.name}:{values}");
             }
-            WriteReadoutFile("DamageTables.csv", lines.ToArray());
+            WriteReadoutFile("DamageTables.txt", lines.ToArray());
         }
 
         public static void WeaponModulesReadout(bool showDebugObjects = false)
