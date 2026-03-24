@@ -87,6 +87,7 @@ namespace DebugTools
             BepinPlugin.Log.LogInfo("Starting CraftableItemDef Readout");
             List<string> lines = new();
             lines.Add("GUID,File Name,Display Name,Crafting Method,Craft Recipe,Recyclable");
+
             foreach (CraftableItemDef craftableItemDef in CraftingDataContainer.Instance.AssetDescriptions)
             {
                 if (!showDebugObjects && IsItemLocked(craftableItemDef.AssetGuid)) { continue; }
@@ -100,10 +101,19 @@ namespace DebugTools
             BepinPlugin.Log.LogInfo("Starting UnlockItemDef Readout");
             List<string> lines = new();
             lines.Add("GUID,File Name,Name,Unlock Criteria,Rank Requirement,Rarity");
+
             foreach (UnlockItemDef unlockItemDef in UnlockContainer.Instance.AssetDescriptions)
             {
+                if (unlockItemDef.Asset == null) continue;
                 if (!showDebugObjects && unlockItemDef.UnlockOptions.UnlockCriteria == UnlockCriteriaType.Never) { continue; }
-                lines.Add($"{unlockItemDef.AssetGuid},{unlockItemDef.Ref.Filename},{unlockItemDef.Asset.name},{unlockItemDef.UnlockOptions.UnlockCriteria},{unlockItemDef.UnlockOptions.RankRequirement},{unlockItemDef.rarity}");
+                lines.Add(
+                    $"{unlockItemDef.AssetGuid}" +
+                    $",{unlockItemDef.Ref.Filename}" +
+                    $",{unlockItemDef.Asset.name}" +
+                    $",{unlockItemDef.UnlockOptions.UnlockCriteria}" +
+                    $",{unlockItemDef.UnlockOptions.RankRequirement}" +
+                    $",{unlockItemDef.rarity}"
+                );
             }
             WriteReadoutFile("Unlockables.csv", lines.ToArray());
         }
