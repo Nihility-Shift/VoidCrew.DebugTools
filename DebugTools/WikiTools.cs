@@ -200,7 +200,7 @@ namespace DebugTools
             lines.Add("GUID,File Name,Display Name,Projectile Count,Missile Range,Damage Type,Damage,Turning Arc Distance,Speed,Shoot Delay,Seek Delay,Angular Multiplier,Inner Radius, Outer Radius");
             foreach (CarryableDef moduleDef in CarryableContainer.Instance.AssetDescriptions)
             {
-                if (moduleDef.Asset is not Payload payload || !payload.TryGetComponent<PayloadMissileGameplayEffect>(out var PMGE)) return;
+                if (moduleDef.Asset is not Payload payload || !payload.TryGetComponent<PayloadMissileGameplayEffect>(out var PMGE)) continue;
 
                 Missile missile = PMGE.ReplacementObjects[0].Asset as Missile;
 
@@ -227,6 +227,11 @@ namespace DebugTools
             }
             WriteReadoutFile("Modules.csv", lines.ToArray());
         }
+
+        //todo
+        // Default level stat table
+        // level stat container
+        // Challenges readout
 
         public static void DeathLootReadout()
         {
