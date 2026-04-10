@@ -21,11 +21,13 @@ Requires: [Dependencies]
 ### 🎮 Client Usage
 
 - F5 Menu > Settings > Debug Tools
-  - Configure settings and generate wiki readouts
+  - Configure settings, disable progress, and generate wiki readouts
 - Toggle spawning menu (Default F10) for a list of items to spawn.
 
 ### 👥 Multiplayer Functionality
 
+- ✅ Progression
+  - Progress must be disabled for spawning objects.
 - ✅ Host
   - The host must have this mod for spawning objects.
 - ✅ Session

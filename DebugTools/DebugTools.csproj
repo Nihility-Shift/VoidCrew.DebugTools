@@ -4,7 +4,7 @@
     <AssemblyName>DebugTools</AssemblyName>
     <Description>
     </Description>
-    <Version>0.0.3</Version>
+    <Version>0.0.4</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
@@ -35,6 +35,7 @@
   <ItemGroup>
     <Reference Include="VoidCrewCommon">
       <HintPath>C:\Users\1redy\.nuget\packages\voidcrew.gamelibs\1.2.4\lib\VoidCrewCommon.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

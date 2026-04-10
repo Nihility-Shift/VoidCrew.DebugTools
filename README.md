@@ -4,7 +4,7 @@
 
 # Debug Tools
 
-Version 0.0.3  
+Version 0.0.4  
 For Game Version 1.3.0  
 Developed by Dragon  
 Requires:  BepInEx-BepInExPack-5.4.2305, NihilityShift-VoidManager-1.2.11
@@ -21,11 +21,13 @@ Requires:  BepInEx-BepInExPack-5.4.2305, NihilityShift-VoidManager-1.2.11
 ### 🎮 Client Usage
 
 - F5 Menu > Settings > Debug Tools
-  - Configure settings and generate wiki readouts
+  - Configure settings, disable progress, and generate wiki readouts
 - Toggle spawning menu (Default F10) for a list of items to spawn.
 
 ### 👥 Multiplayer Functionality
 
+- ✅ Progression
+  - Progress must be disabled for spawning objects.
 - ✅ Host
   - The host must have this mod for spawning objects.
 - ✅ Session
