@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using VoidManager.Progression;
 using VoidManager.Utilities;
 using static DebugTools.Common;
 using static UnityEngine.GUILayout;
@@ -192,12 +193,6 @@ namespace DebugTools
         void SpawnItemButton(SpawnEntry spawnData)
         {
             // Filter logic
-            if (VoidManager.Progression.ProgressionHandler.ProgressionEnabled)
-            {
-                Messaging.Notification("Cannot spawn items while progress is enabled (Have host disable from F5 menu)");
-                return;
-            }
-
             if (!ShowDebugDev && spawnData.LockedDevItem) return;
             if (!ShowVanilla && !spawnData.Runtime) return;
             if (!ShowRuntime && spawnData.Runtime) return;
@@ -207,6 +202,11 @@ namespace DebugTools
 
             if (Button(spawnData.SEContent))
             {
+                if (ProgressionHandler.ProgressionEnabled)
+                {
+                    Messaging.Notification("Cannot spawn items while progress is enabled (Have host disable from F5 menu)");
+                    return;
+                }
                 if (LocalPlayer.Instance == null || !VoidManagerPlugin.Enabled) return;
                 Transform camera = Camera.main.gameObject.transform;
                 Vector3 Spawnpos = camera.position + camera.forward * DistanceOffset; // Vector3.up keeps it from being feet level.

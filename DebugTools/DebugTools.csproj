@@ -13,7 +13,7 @@
       https://nuget.samboy.dev/v3/index.json
     </RestoreAdditionalProjectSources>
     <RootNamespace>DebugTools</RootNamespace>
-    <AssemblyTitle>A collection of debug and wiki tools for Void Crew</AssemblyTitle>
+    <AssemblyTitle>A collection of debug and wiki tools for Void Crew.</AssemblyTitle>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>embedded</DebugType>
