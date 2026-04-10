@@ -7,8 +7,8 @@ namespace DebugTools
         public const string PLUGIN_GUID = $"{PLUGIN_ORIGINAL_AUTHOR}.{PLUGIN_NAME}";
         public const string PLUGIN_NAME = "DebugTools";
         public const string USERS_PLUGIN_NAME = "Debug Tools";
-        public const string PLUGIN_VERSION = "0.0.3";
-        public const string PLUGIN_DESCRIPTION = "A collection of debug and wiki tools for Void Crew";
+        public const string PLUGIN_VERSION = "0.0.4";
+        public const string PLUGIN_DESCRIPTION = "A collection of debug and wiki tools for Void Crew.";
         public const string PLUGIN_ORIGINAL_AUTHOR = "Dragon";
         public const string PLUGIN_AUTHORS = "Dragon";
         public const string PLUGIN_THUNDERSTORE_ID = "";
