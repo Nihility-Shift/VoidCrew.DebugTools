@@ -2,6 +2,7 @@
 - Mandated progression disabled for item spawning
 - Fixed missile readout not working
 - Changed Damage Tables readout back to .txt output
+- Added icon
 
 ## 0.0.3
 - Wiki Tools now output Sector Rewards and Death Loot.
