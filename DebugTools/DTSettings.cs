@@ -1,8 +1,10 @@
-﻿using System.Diagnostics;
+﻿using Photon.Pun;
+using System.Diagnostics;
 using System.IO;
 using UnityEngine;
 using VoidManager.CustomGUI;
 using VoidManager.Progression;
+using VoidManager.Utilities;
 using static UnityEngine.GUILayout;
 using static VoidManager.Utilities.GUITools;
 
@@ -41,7 +43,10 @@ namespace DebugTools
             // Progression disable section.
             if (ProgressionHandler.ProgressionEnabled && Button("DisableProgress"))
             {
-                DPCheck = true;
+                if (!PhotonNetwork.IsMasterClient)
+                    Messaging.Notification("Only the host can disable progress!");
+                else
+                    DPCheck = true;
             }
             if (DPCheck && Button("Are you sure?"))
             {
