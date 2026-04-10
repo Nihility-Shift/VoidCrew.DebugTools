@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using VoidManager.Utilities;
 using static DebugTools.Common;
 using static UnityEngine.GUILayout;
 using static VoidManager.Utilities.GUITools;
@@ -191,6 +192,12 @@ namespace DebugTools
         void SpawnItemButton(SpawnEntry spawnData)
         {
             // Filter logic
+            if (VoidManager.Progression.ProgressionHandler.ProgressionEnabled)
+            {
+                Messaging.Notification("Cannot spawn items while progress is enabled (Have host disable from F5 menu)");
+                return;
+            }
+
             if (!ShowDebugDev && spawnData.LockedDevItem) return;
             if (!ShowVanilla && !spawnData.Runtime) return;
             if (!ShowRuntime && spawnData.Runtime) return;
