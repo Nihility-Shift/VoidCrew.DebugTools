@@ -72,7 +72,7 @@ namespace DebugTools
 
                 try
                 {
-                    lines.Add($"{compositeWeaponDataDef.AssetGuid},{compositeWeaponDataDef.Ref.Filename},{compositeWeaponDataDef.Asset.DisplayName},{compositeWeaponDataDef.Category},{barrel.Accuracy.MinValue}-{barrel.Accuracy.MaxValue},{projectileStats.Damage.MinValue}-{projectileStats.Damage.MaxValue},{feederStats.FireRate.MinValue}-{feederStats.FireRate.MaxValue},{projectileStats.Range.BaseValue},{projectileStats.ProjectileSpeed.BaseValue},{projectileElement.DamageType.name},{feeder.SpreadBase}-{feeder.SpreadMax},{feeder.SpreadDecreaseSpeed},{feeder.SpreadIncreasePerSecond},{feeder.spreadIncreaseFactor},{feeder.spreadDecreaseFactor}");
+                    lines.Add($"{compositeWeaponDataDef.AssetGuid},{compositeWeaponDataDef.Ref.Filename},{compositeWeaponDataDef.Asset.DisplayName},{compositeWeaponDataDef.Category},{barrel.Accuracy.MinValue}-{barrel.Accuracy.MaxValue},{projectileStats.Damage.MinValue}-{projectileStats.Damage.MaxValue},{feederStats.FireRate.MinValue}-{feederStats.FireRate.MaxValue},{projectileStats.Range.BaseValue},{projectileStats.ProjectileSpeed.BaseValue},{weapon.DamageType.name},{feeder.SpreadBase}-{feeder.SpreadMax},{feeder.SpreadDecreaseSpeed},{feeder.SpreadIncreasePerSecond},{feeder.spreadIncreaseFactor},{feeder.spreadDecreaseFactor}");
                 }
                 catch(Exception ex)
                 {
