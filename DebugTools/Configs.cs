@@ -13,6 +13,8 @@ namespace DebugTools
         internal static ConfigEntry<bool> SpawnFiltersWeaponBoxes;
         internal static ConfigEntry<bool> SpawnFiltersCarryables;
 
+        internal static ConfigEntry<int> LevelScalingCalculationCount;
+
         internal static void Load(BepinPlugin plugin)
         {
             MenuUnlockCursor = plugin.Config.Bind("Menu", "MenuUnlockCursor", true);
@@ -24,6 +26,8 @@ namespace DebugTools
             SpawnFiltersModded = plugin.Config.Bind("SpawnMenu", "ShowModded", true);
             SpawnFiltersWeaponBoxes = plugin.Config.Bind("SpawnMenu", "ShowWeaponBuildBoxes", false);
             SpawnFiltersCarryables = plugin.Config.Bind("SpawnMenu", "ShowCarryables", true);
+
+            LevelScalingCalculationCount = plugin.Config.Bind("Readouts", "LevelScalingCalculationCount", 10, "How many levels are calculated when outputing level scaling data.");
         }
     }
 }

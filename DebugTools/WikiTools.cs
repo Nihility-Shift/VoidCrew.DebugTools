@@ -4,6 +4,7 @@ using CG.Ship.Modules.Shield;
 using Gameplay.CompositeWeapons;
 using Gameplay.Damage;
 using Gameplay.Loot;
+using Gameplay.Tags;
 using ResourceAssets;
 using System;
 using System.Collections.Generic;
@@ -37,6 +38,7 @@ namespace DebugTools
             MissilesReadout();
             ModulesReadout();
             DeathLootReadout();
+            LevelScalingReadout(Configs.LevelScalingCalculationCount.Value);
         }
 
         public static void DamageTablesReadout()
@@ -219,10 +221,116 @@ namespace DebugTools
             WriteReadoutFile("Modules.csv", lines.ToArray());
         }
 
+        /// <summary>
+        /// Readout for level scaling
+        /// </summary>
+        /// <param name="levelCount">How many levels to calculate stats for</param>
+        public static void LevelScalingReadout(int levelCount)
+        {
+            BepinPlugin.Log.LogInfo("Starting Level Scaling Readout");
+            List<string> lines = new();
+
+            //Build header based on level count.
+            string header = "GUID\tFile Name\tObject Name\tCategory\tRequired Tags\tStat Type\tUsing Fallback Calculation";
+            for (int i = 0; i < levelCount; i++) header += $"\tLevel {i}";
+            lines.Add(header);
+
+            foreach (LevelScalingObjectDef levelScalingObjectDef in LevelScalingObjectContainer.Instance.RuntimeDescriptions)
+            {
+                GUIDUnion guid = levelScalingObjectDef.AssetGuid;
+                string filename = levelScalingObjectDef.Ref.Filename;
+                string objectname = levelScalingObjectDef.LevelData.name;
+                foreach (ExtendedCollectionLevelStat WLStat in levelScalingObjectDef.LevelData.WeaponLevelStats)
+                {
+                    foreach (LevelStat stat in WLStat.Stats)
+                    {
+                        lines.Add($"{guid}\t{filename}\t{objectname}\tWeapon Stats\t{CSTagsAsString(WLStat.RequiredLocalTags)}\t{StatValueAtLevels(stat, levelCount)}");
+                    }
+                }
+                foreach (LevelStat stat in levelScalingObjectDef.LevelData.PrimaryLevelStats)
+                {
+                    lines.Add($"{guid}\t{filename}\t{objectname}\tPrimary Stats\t\t{StatValueAtLevels(stat, levelCount)}");
+                }
+            }
+            WriteReadoutFile("LevelScaling.tsv", lines.ToArray());
+        }
+
+        /// <summary>
+        /// type,UsingFallback,Values
+        /// </summary>
+        /// <param name="stat"></param>
+        /// <param name="levelCount">How many levels to calculate stats for</param>
+        /// <returns></returns>
+        public static string StatValueAtLevels(LevelStat stat, int levelCount)
+        {
+            string output = $"{stat.Type},{stat.UseFallbackScaling.ToString()}";
+
+            if (stat is LevelStatInt intLevelStat)
+            {
+                for (int i = 0; i < levelCount; i++)
+                {
+                    output += $",{intLevelStat.GetValueAtLevel(i)}";
+                }
+            }
+            else if (stat is LevelStatFloat floatLevelStat)
+            {
+                for (int i = 0; i < levelCount; i++)
+                {
+                    output += $",{floatLevelStat.GetValueAtLevel(i)}";
+                }
+            }
+            
+            return output;
+        }
+
+        public static string CSTagsAsString(CsTag[] tags)
+        {
+            string output = string.Empty;
+            output += tags[0].DisplayProperties.Name;
+            for (int i = 1; i < tags.Length; i++)
+            {
+                output += ", " + tags[i].DisplayProperties.Name;
+            }
+            return output;
+        }
+
+        //Original write attempt for all values affecting scaling. Abandoned after determining I'd have to case for 7 scaler types.
+        /*
+        public static string LevelStatsAsString(List<LevelStat> stats)
+        {
+            string output = string.Empty;
+            output += LevelStatPrint(stats[0]);
+            for (int i = 1; i < stats.Count; i++)
+            {
+                output += "," + LevelStatPrint(stats[i]);
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// FallbackScaling,TypeID,Base,IncrimentPerLevel,CustomScaler Type
+        /// </summary>
+        /// <param name="stat"></param>
+        /// <returns></returns>
+        public static string LevelStatPrint(LevelStat stat)
+        {
+            if (stat is LevelStatInt intLevelStat)
+            {
+                return $"{stat.UseFallbackScaling},{intLevelStat.Type},{intLevelStat.Base},{intLevelStat.IncrementPerLevel},";
+            }
+            else if (stat is LevelStatFloat floatLevelStat)
+            {
+                return $"{stat.UseFallbackScaling},{floatLevelStat.Type},{floatLevelStat.Base},{floatLevelStat.IncrementPerLevel},{floatLevelStat.CustomScaler.GetType()}"; ;
+            }
+            return ",,,,";
+        }
+        */
+
+
         //todo
         // Default level stat table
-        // level stat container
-        // Challenges readout
+        // Loadouts readout
+        // Missiles => Payloads
 
         public static void DeathLootReadout()
         {

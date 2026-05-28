@@ -77,6 +77,10 @@ namespace DebugTools
             if (Button("Modules")) WikiTools.ModulesReadout();
             if (Button("Death Loot")) WikiTools.DeathLootReadout();
             BeginHorizontal();
+            if (Button("Level Scaling Data"), WikiTools.LevelScalingReadout(Configs.LevelScalingCalculationCount.Value);
+            DrawTextField("Data Level Count", ref Configs.LevelScalingCalculationCount);
+            EndHorizontal();
+            BeginHorizontal();
             if (Button("Endless Drop Table")) WikiTools.EndlessQuestDropTablesReadout();
             if (Button("Endless Sector Reward Table")) WikiTools.EndlessQuestRewardsTableReadout();
             if (Button("Survivor Drop Table")) WikiTools.SurvivorQuestDropTablesReadout();
