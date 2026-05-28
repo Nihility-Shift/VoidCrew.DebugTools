@@ -294,41 +294,7 @@ namespace DebugTools
             return output;
         }
 
-        //Original write attempt for all values affecting scaling. Abandoned after determining I'd have to case for 7 scaler types.
-        /*
-        public static string LevelStatsAsString(List<LevelStat> stats)
-        {
-            string output = string.Empty;
-            output += LevelStatPrint(stats[0]);
-            for (int i = 1; i < stats.Count; i++)
-            {
-                output += "," + LevelStatPrint(stats[i]);
-            }
-            return output;
-        }
-
-        /// <summary>
-        /// FallbackScaling,TypeID,Base,IncrimentPerLevel,CustomScaler Type
-        /// </summary>
-        /// <param name="stat"></param>
-        /// <returns></returns>
-        public static string LevelStatPrint(LevelStat stat)
-        {
-            if (stat is LevelStatInt intLevelStat)
-            {
-                return $"{stat.UseFallbackScaling},{intLevelStat.Type},{intLevelStat.Base},{intLevelStat.IncrementPerLevel},";
-            }
-            else if (stat is LevelStatFloat floatLevelStat)
-            {
-                return $"{stat.UseFallbackScaling},{floatLevelStat.Type},{floatLevelStat.Base},{floatLevelStat.IncrementPerLevel},{floatLevelStat.CustomScaler.GetType()}"; ;
-            }
-            return ",,,,";
-        }
-        */
-
-
         //todo
-        // Default level stat table
         // Loadouts readout
         // Missiles => Payloads
 
