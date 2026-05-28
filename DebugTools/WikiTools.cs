@@ -38,6 +38,7 @@ namespace DebugTools
             PayloadsReadout();
             ModulesReadout();
             DeathLootReadout();
+            ShipLoadoutsReadout;
             LevelScalingReadout(Configs.LevelScalingCalculationCount.Value);
         }
 
@@ -198,21 +199,21 @@ namespace DebugTools
                 // Missiles
                 if (PRGE is PayloadMissileGameplayEffect PMGE)
                 {
-                Missile missile = PMGE.ReplacementObjects[0].Asset as Missile;
+                    Missile missile = PMGE.ReplacementObjects[0].Asset as Missile;
 
-                if (missile is not AOEMissile aoeMissile)
-                {
-                    lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{PMGE.Payload.DisplayName},{PMGE.ReplacementObjects.Count},{missile.Range.Value},{missile.DamageType.name},{missile.Damage.Value},{missile.MovementArcLength},{missile.Speed.Value},{missile.ShootDelaySeconds},{missile.SeekDelaySeconds},{missile.angularMultiplier}");
-                }
-                else
-                {
-                    lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{PMGE.Payload.DisplayName},{PMGE.ReplacementObjects.Count},{missile.Range.Value},{missile.DamageType.name},{missile.Damage.Value},{missile.MovementArcLength},{missile.Speed.Value},{missile.ShootDelaySeconds},{missile.SeekDelaySeconds},{missile.angularMultiplier},{aoeMissile.InnerExplosionRadius},{aoeMissile.OuterExplosionRadius}");
-                }
-            }
+                    if (missile is not AOEMissile aoeMissile)
+                    {
+                        lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{PMGE.Payload.DisplayName},{PMGE.ReplacementObjects.Count},{missile.Range.Value},{missile.DamageType.name},{missile.Damage.Value},{missile.MovementArcLength},{missile.Speed.Value},{missile.ShootDelaySeconds},{missile.SeekDelaySeconds},{missile.angularMultiplier}");
+                    }
+                    else
+                    {
+                        lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{PMGE.Payload.DisplayName},{PMGE.ReplacementObjects.Count},{missile.Range.Value},{missile.DamageType.name},{missile.Damage.Value},{missile.MovementArcLength},{missile.Speed.Value},{missile.ShootDelaySeconds},{missile.SeekDelaySeconds},{missile.angularMultiplier},{aoeMissile.InnerExplosionRadius},{aoeMissile.OuterExplosionRadius}");
+                    }
+                } // All other payloads
                 else
                 {
                     lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{PRGE.Payload.DisplayName},{PRGE.ReplacementObjects.Count}");
-        }
+                }
             }
             WriteReadoutFile("Payloads.csv", lines.ToArray());
         }
@@ -271,7 +272,7 @@ namespace DebugTools
         /// <returns></returns>
         public static string StatValueAtLevels(LevelStat stat, int levelCount)
         {
-            string output = $"{stat.Type},{stat.UseFallbackScaling.ToString()}";
+            string output = $"{stat.Type},{stat.UseFallbackScaling}";
 
             if (stat is LevelStatInt intLevelStat)
             {
@@ -293,18 +294,31 @@ namespace DebugTools
 
         public static string CSTagsAsString(CsTag[] tags)
         {
-            string output = string.Empty;
-            output += tags[0].DisplayProperties.Name;
-            for (int i = 1; i < tags.Length; i++)
-            {
-                output += ", " + tags[i].DisplayProperties.Name;
-            }
-            return output;
+            return string.Join(",", tags.Select(t => t.DisplayProperties.Name));
         }
 
-        //todo
-        // Loadouts readout
-        // Missiles => Payloads
+        public static void ShipLoadoutsReadout()
+        {
+            BepinPlugin.Log.LogInfo("Starting Ship Loadouts Readout");
+            List<string> lines = new();
+            lines.Add("GUID\tFile Name\tShip GUID\tDisplay Name\tModules\tResources");
+            foreach (ShipLoadoutDataDef shipLoadoutDataDef in ShipLoadoutDataContainer.Instance.RuntimeDescriptions)
+            {
+                var loadout = shipLoadoutDataDef.Asset.ShipLoadout;
+                lines.Add($"{shipLoadoutDataDef.AssetGuid}\t{shipLoadoutDataDef.Ref.Filename}\t{shipLoadoutDataDef.ShipGuid}\t{shipLoadoutDataDef.ContextInfo.HeaderText}\t{GetAllModules(loadout)}\t{GetAllResources(loadout)}");
+            }
+            WriteReadoutFile("Modules.tsv", lines.ToArray());
+        }
+
+        public static string GetAllModules(ShipLoadout loadout)
+        {
+            return string.Join(",", loadout.GetAllModulesOnSockets());
+        }
+
+        public static string GetAllResources(ShipLoadout loadout)
+        {
+            return string.Join(",", loadout.GetAllResourceInfos().Select(t => t.AssetGuid));
+        }
 
         public static void DeathLootReadout()
         {
