@@ -4,7 +4,7 @@
 
 # Debug Tools
 
-Version 0.0.4  
+Version 0.0.5  
 For Game Version 1.3.0  
 Developed by Dragon  
 Requires:  BepInEx-BepInExPack-5.4.2305, NihilityShift-VoidManager-1.2.11
@@ -16,7 +16,24 @@ Requires:  BepInEx-BepInExPack-5.4.2305, NihilityShift-VoidManager-1.2.11
 
 - Spawns items, both vanilla and modded.
 - Provides button for disabling progress in Settings menu.
-- Provides buttons for generating wiki readouts.
+- Provides buttons for generating wiki readouts. Available Readouts:
+  - Damage Tables
+  - Weapon Modules
+  - Craftables
+  - Unlockables
+  - Carryables
+  - Quest Assets
+  - Clonestar Objects
+  - Scriptable Objects
+  - Death Loot/Drop Tables
+  - Rewards Tables
+  - Shields
+  - KPD Modules
+  - Missiles
+  - Modules
+  - Stat Types
+  - Ship Loadouts
+  - Level Scaling Data
 
 ### 🎮 Client Usage
 

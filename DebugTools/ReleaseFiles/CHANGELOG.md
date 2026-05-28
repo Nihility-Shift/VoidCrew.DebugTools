@@ -1,3 +1,8 @@
+## 0.0.5
+- Added Ship Loadouts, Stat Types, and Level Stats Readouts to wikitools
+- Changd Missiles readout to payloads readout for mines reading
+- Added config for wiki readout debug output
+
 ## 0.0.4
 - Mandated progression disabled for item spawning
 - Fixed missile readout not working
