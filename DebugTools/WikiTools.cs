@@ -35,7 +35,7 @@ namespace DebugTools
             SurvivorQuestDropTablesReadout();
             ShieldsReadout();
             KPDsReadout();
-            MissilesReadout();
+            PayloadsReadout();
             ModulesReadout();
             DeathLootReadout();
             LevelScalingReadout(Configs.LevelScalingCalculationCount.Value);
@@ -186,15 +186,18 @@ namespace DebugTools
             WriteReadoutFile("KineticPointDefenceModules.csv", lines.ToArray());
         }
 
-        public static void MissilesReadout()
+        public static void PayloadsReadout()
         {
-            BepinPlugin.Log.LogInfo("Starting Missile Readout");
+            BepinPlugin.Log.LogInfo("Starting Payloads Readout");
             List<string> lines = new();
             lines.Add("GUID,File Name,Display Name,Projectile Count,Missile Range,Damage Type,Damage,Turning Arc Distance,Speed,Shoot Delay,Seek Delay,Angular Multiplier,Inner Radius, Outer Radius");
             foreach (CarryableDef moduleDef in CarryableContainer.Instance.RuntimeDescriptions)
             {
-                if (moduleDef.Asset is not Payload payload || !payload.TryGetComponent<PayloadMissileGameplayEffect>(out var PMGE)) continue;
+                if (moduleDef.Asset is not Payload payload || !payload.TryGetComponent<PayloadReplaceGameplayEffect>(out var PRGE)) continue;
 
+                // Missiles
+                if (PRGE is PayloadMissileGameplayEffect PMGE)
+                {
                 Missile missile = PMGE.ReplacementObjects[0].Asset as Missile;
 
                 if (missile is not AOEMissile aoeMissile)
@@ -206,7 +209,12 @@ namespace DebugTools
                     lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{PMGE.Payload.DisplayName},{PMGE.ReplacementObjects.Count},{missile.Range.Value},{missile.DamageType.name},{missile.Damage.Value},{missile.MovementArcLength},{missile.Speed.Value},{missile.ShootDelaySeconds},{missile.SeekDelaySeconds},{missile.angularMultiplier},{aoeMissile.InnerExplosionRadius},{aoeMissile.OuterExplosionRadius}");
                 }
             }
-            WriteReadoutFile("Missiles.csv", lines.ToArray());
+                else
+                {
+                    lines.Add($"{moduleDef.AssetGuid},{moduleDef.Ref.Filename},{PRGE.Payload.DisplayName},{PRGE.ReplacementObjects.Count}");
+        }
+            }
+            WriteReadoutFile("Payloads.csv", lines.ToArray());
         }
 
         public static void ModulesReadout()

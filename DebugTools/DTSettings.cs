@@ -73,7 +73,7 @@ namespace DebugTools
             if (Button("Scriptable Objects")) WikiTools.ScriptableObjectReadout();
             if (Button("Shield Modules")) WikiTools.ShieldsReadout();
             if (Button("KPD Modules")) WikiTools.KPDsReadout();
-            if (Button("Missiles")) WikiTools.MissilesReadout();
+            if (Button("Payloads")) WikiTools.PayloadsReadout();
             if (Button("Modules")) WikiTools.ModulesReadout();
             if (Button("Death Loot")) WikiTools.DeathLootReadout();
             BeginHorizontal();
