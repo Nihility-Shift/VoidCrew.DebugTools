@@ -14,6 +14,7 @@ namespace DebugTools
         internal static ConfigEntry<bool> SpawnFiltersCarryables;
 
         internal static ConfigEntry<int> LevelScalingCalculationCount;
+        internal static ConfigEntry<bool> ReadoutsDebugOutput;
 
         internal static void Load(BepinPlugin plugin)
         {
@@ -28,6 +29,7 @@ namespace DebugTools
             SpawnFiltersCarryables = plugin.Config.Bind("SpawnMenu", "ShowCarryables", true);
 
             LevelScalingCalculationCount = plugin.Config.Bind("Readouts", "LevelScalingCalculationCount", 10, "How many levels are calculated when outputing level scaling data.");
+            ReadoutsDebugOutput = plugin.Config.Bind("Readouts", "ReadoutsDebugOutput", false, "Shows or hides debug data in file outputs where available.");
         }
     }
 }

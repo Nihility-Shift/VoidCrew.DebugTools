@@ -10,8 +10,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using VC.Common.CoreData;
 using VoidManager.Utilities;
+using WebSocketSharp;
 using static DebugTools.Common;
 
 namespace DebugTools
@@ -38,7 +40,7 @@ namespace DebugTools
             PayloadsReadout();
             ModulesReadout();
             DeathLootReadout();
-            ShipLoadoutsReadout;
+            ShipLoadoutsReadout(showDebugObjects);
             LevelScalingReadout(Configs.LevelScalingCalculationCount.Value);
         }
 
@@ -78,7 +80,7 @@ namespace DebugTools
                 {
                     lines.Add($"{compositeWeaponDataDef.AssetGuid},{compositeWeaponDataDef.Ref.Filename},{compositeWeaponDataDef.Asset.DisplayName},{compositeWeaponDataDef.Category},{barrel.Accuracy.MinValue}-{barrel.Accuracy.MaxValue},{projectileStats.Damage.MinValue}-{projectileStats.Damage.MaxValue},{feederStats.FireRate.MinValue}-{feederStats.FireRate.MaxValue},{projectileStats.Range.BaseValue},{projectileStats.ProjectileSpeed.BaseValue},{weapon.DamageType.name},{feeder.SpreadBase}-{feeder.SpreadMax},{feeder.SpreadDecreaseSpeed},{feeder.SpreadIncreasePerSecond},{feeder.spreadIncreaseFactor},{feeder.spreadDecreaseFactor}");
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     BepinPlugin.Log.LogWarning($"Caught error while processing Weapon Modules readout for {compositeWeaponDataDef.Ref.Filename}\n{ex.Message}");
                 }
@@ -272,20 +274,20 @@ namespace DebugTools
         /// <returns></returns>
         public static string StatValueAtLevels(LevelStat stat, int levelCount)
         {
-            string output = $"{stat.Type},{stat.UseFallbackScaling}";
+            string output = $"{stat.Type}\t{stat.UseFallbackScaling}";
 
             if (stat is LevelStatInt intLevelStat)
             {
                 for (int i = 0; i < levelCount; i++)
                 {
-                    output += $",{intLevelStat.GetValueAtLevel(i)}";
+                    output += $"\t{intLevelStat.GetValueAtLevel(i)}";
                 }
             }
             else if (stat is LevelStatFloat floatLevelStat)
             {
                 for (int i = 0; i < levelCount; i++)
                 {
-                    output += $",{floatLevelStat.GetValueAtLevel(i)}";
+                    output += $"\t{floatLevelStat.GetValueAtLevel(i)}";
                 }
             }
             
@@ -294,20 +296,33 @@ namespace DebugTools
 
         public static string CSTagsAsString(CsTag[] tags)
         {
-            return string.Join(",", tags.Select(t => t.DisplayProperties.Name));
+            return string.Join(",", tags.Select(t => t.DisplayProperties.Name.String));
         }
 
-        public static void ShipLoadoutsReadout()
+        public static void ShipLoadoutsReadout(bool showDebugObjects = false)
         {
             BepinPlugin.Log.LogInfo("Starting Ship Loadouts Readout");
             List<string> lines = new();
-            lines.Add("GUID\tFile Name\tShip GUID\tDisplay Name\tModules\tResources");
+            lines.Add("GUID\tFile Name\tShip GUID\tDisplay Name\tBody Text");
             foreach (ShipLoadoutDataDef shipLoadoutDataDef in ShipLoadoutDataContainer.Instance.RuntimeDescriptions)
             {
-                var loadout = shipLoadoutDataDef.Asset.ShipLoadout;
-                lines.Add($"{shipLoadoutDataDef.AssetGuid}\t{shipLoadoutDataDef.Ref.Filename}\t{shipLoadoutDataDef.ShipGuid}\t{shipLoadoutDataDef.ContextInfo.HeaderText}\t{GetAllModules(loadout)}\t{GetAllResources(loadout)}");
+                try
+                {
+                    if (shipLoadoutDataDef.ContextInfo.BodyText.IsNullOrEmpty() || (!showDebugObjects && IsItemLocked(shipLoadoutDataDef.AssetGuid))) continue;
+
+                    lines.Add($"{shipLoadoutDataDef.AssetGuid}\t{shipLoadoutDataDef.Ref.Filename}\t{shipLoadoutDataDef.ShipGuid}\t{shipLoadoutDataDef?.ContextInfo.HeaderText}\t{shipLoadoutDataDef?.ContextInfo.BodyText.RemoveSpecialStrings()}");//\t{GetAllModules(loadout)}\t{GetAllResources(loadout)}");
+                }
+                catch (Exception ex)
+                {
+                    BepinPlugin.Log.LogError($"Caught exception while loading ship Loadout GUID {shipLoadoutDataDef.AssetGuid}\n{ex}");
+                }
             }
-            WriteReadoutFile("Modules.tsv", lines.ToArray());
+            WriteReadoutFile("ShipLoadouts.tsv", lines.ToArray());
+        }
+
+        public static string RemoveSpecialStrings(this string str)
+        {
+            return Regex.Replace(str, "<.*?>", string.Empty).Replace("\r", " ").Replace("\n", " ");
         }
 
         public static string GetAllModules(ShipLoadout loadout)
@@ -329,7 +344,7 @@ namespace DebugTools
             foreach (var thing in LootOnDeathDropperContainer.Instance.RuntimeDescriptions)
             {
                 string customTableNames = string.Empty;
-                foreach(var table in thing.Asset.customLootTables)
+                foreach (var table in thing.Asset.customLootTables)
                 {
                     CustomTables.Add(table);
                     customTableNames += table.name + ",";
