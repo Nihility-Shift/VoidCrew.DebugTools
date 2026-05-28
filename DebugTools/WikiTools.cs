@@ -42,6 +42,7 @@ namespace DebugTools
             DeathLootReadout();
             ShipLoadoutsReadout(showDebugObjects);
             LevelScalingReadout(Configs.LevelScalingCalculationCount.Value);
+            StatTypesReadout();
         }
 
         public static void DamageTablesReadout()
@@ -290,7 +291,7 @@ namespace DebugTools
                     output += $"\t{floatLevelStat.GetValueAtLevel(i)}";
                 }
             }
-            
+
             return output;
         }
 
@@ -448,7 +449,7 @@ namespace DebugTools
                     }
                 }
                 foreach (DropBucketEntry DBE in CDC.BossDrops.Entries)
-                lines.Add($"{DBE.Item.AssetGuid},{DBE.Item.Filename},{DBE.Quantity},Boss,{i}");
+                    lines.Add($"{DBE.Item.AssetGuid},{DBE.Item.Filename},{DBE.Quantity},Boss,{i}");
             }
 
             WriteReadoutFile("EndlessQuestSectorRewards.csv", lines.ToArray());
@@ -465,6 +466,18 @@ namespace DebugTools
                 }
             }
             return setFlags.Trim();
+        }
+
+        public static void StatTypesReadout()
+        {
+            BepinPlugin.Log.LogInfo("Starting Stat Types Readout");
+            List<string> lines = new();
+            lines.Add("GUID,Stat ID,Display Name,Body Text");
+            foreach (StatStructure stat in StatTable.Instance.statStructures)
+            {
+                lines.Add($"{stat.ContextInfo.assetGuid},{stat.ModType},{stat.ContextInfo.HeaderText},{stat.ContextInfo.BodyText}");
+            }
+            WriteReadoutFile("StatTypes.csv", lines.ToArray());
         }
 
         // Getter since static string defaulted to Void Crew parent folder.

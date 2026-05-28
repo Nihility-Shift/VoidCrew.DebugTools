@@ -77,6 +77,7 @@ namespace DebugTools
             if (Button("Modules")) WikiTools.ModulesReadout();
             if (Button("Death Loot")) WikiTools.DeathLootReadout();
             if (Button("Ship Loadouts")) WikiTools.ShipLoadoutsReadout(WikiDebugItems);
+            if (Button("Stat Types")) WikiTools.StatTypesReadout();
             BeginHorizontal();
             if (Button("Level Scaling Data")) WikiTools.LevelScalingReadout(Configs.LevelScalingCalculationCount.Value);
             DrawTextField("Data Level Count", ref Configs.LevelScalingCalculationCount);
